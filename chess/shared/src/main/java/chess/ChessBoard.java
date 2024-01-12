@@ -7,6 +7,7 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
+    //private  rows;
 
     public ChessBoard() {
         
