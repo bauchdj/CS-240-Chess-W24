@@ -29,5 +29,5 @@ bin/
 .DS_Store
 
 240-repo
-.idea*
+**/.idea/
 CS-240-Chess-W24.iml
