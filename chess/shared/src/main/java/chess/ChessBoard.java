@@ -7,10 +7,10 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    //private  rows;
+    private ChessPiece[][] board;
 
     public ChessBoard() {
-        
+        resetBoard();
     }
 
     /**
@@ -20,7 +20,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        int row = position.getRow();
+        int col = position.getColumn();
+        board[row][col] = piece;
     }
 
     /**
@@ -31,7 +33,9 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        int row = position.getRow();
+        int col = position.getColumn();
+        return board[row][col];
     }
 
     /**
@@ -39,6 +43,35 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        board = new ChessPiece[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            ChessPiece.PieceType type = getPieceType(i);
+            board[0][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
+            board[1][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            board[6][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            board[7][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+        }
+    }
+
+    private static ChessPiece.PieceType getPieceType(int i) {
+        ChessPiece.PieceType type = null;
+
+        switch (i) {
+            case 0:
+            case 7:
+                type = ChessPiece.PieceType.ROOK;
+            case 1:
+            case 6:
+                type = ChessPiece.PieceType.KNIGHT;
+            case 2:
+            case 5:
+                type = ChessPiece.PieceType.BISHOP;
+            case 3:
+                type = ChessPiece.PieceType.QUEEN;
+            case 4:
+                type = ChessPiece.PieceType.KING;
+        }
+        return type;
     }
 }
