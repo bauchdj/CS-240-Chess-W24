@@ -38,12 +38,6 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        if (this.promotionPiece == null) return null;
-        //if (this.promotionPiece == ChessPiece.PieceType.PAWN && this.getEndPosition().getRow() == 1) {
-        //if ()
-        // color of piece, then determine if row 1 or row 8 based on color.
-        //    return this.promotionPiece;
-        //}
         return this.promotionPiece;
     }
 }
