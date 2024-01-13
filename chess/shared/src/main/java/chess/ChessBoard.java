@@ -8,6 +8,7 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] board;
+	private static final int BOARD_SIZE = 8;
 
     public ChessBoard() {
         resetBoard();
@@ -35,7 +36,8 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int row = position.getRow();
         int col = position.getColumn();
-		if (row < 0 || row > 7 || col < 0 || col > 7) return null;
+		int limit = BOARD_SIZE - 1;
+		if (row < 0 || row > limit|| col < 0 || col > limit) return null;
         return board[row][col];
     }
 
@@ -44,9 +46,9 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        board = new ChessPiece[8][8];
+        board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
             ChessPiece.PieceType type = getPieceType(i);
             board[0][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
             board[1][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
