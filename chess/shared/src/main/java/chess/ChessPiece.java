@@ -13,7 +13,6 @@ public class ChessPiece {
     private ChessGame.TeamColor color;
     private ChessPiece.PieceType type;
     private boolean beenMoved;
-    private static final int BOARD_SIZE = 8;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
@@ -83,10 +82,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private static boolean isValidIndex(int row, int col) {
-        int limit = BOARD_SIZE - 1;
-        return !(row < 0 || row > limit || col < 0 || col > limit);
-    }
+    private static boolean isValidIndex(int row, int col) { return !ChessBoard.isValidRowCol(row, col); }
 
     private static ChessPiece pieceAtRowCol(ChessBoard board, int row, int col) {
         ChessPosition pos = new ChessPosition(row, col);

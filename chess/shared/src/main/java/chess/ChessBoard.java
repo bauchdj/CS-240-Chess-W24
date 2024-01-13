@@ -36,12 +36,16 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
-		int limit = BOARD_SIZE - 1;
-		if (row < 0 || row > limit|| col < 0 || col > limit) return null;
+		if (isValidRowCol(row, col)) return null;
         return board[row][col];
     }
 
-    /**
+	public static boolean isValidRowCol(int row, int col) {
+		int limit = BOARD_SIZE - 1;
+		return row < 0 || row > limit|| col < 0 || col > limit;
+	}
+
+	/**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
