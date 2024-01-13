@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Represents a single chess piece
@@ -54,23 +55,28 @@ public class ChessPiece {
         ChessPiece.PieceType type = board.getPiece(myPosition).getPieceType();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
+        Collection<ChessMove> moves = new HashSet<>();
 
         switch (type) {
-            case ROOK:
-                throw new RuntimeException("ROOK movement");
+            case ROOK: // moves side to side
+                System.out.println("ROOK");
                 break;
-            case KNIGHT:
-                throw new RuntimeException("KNIGHT movement");
+            case KNIGHT: // 2 in one direction, 1 in the other
+                System.out.println("KNIGHT");
                 break;
-            case BISHOP:
-
+            case BISHOP: // moves diagonally
+                // Calc where I can move
+                // Create ChessMove Object if move valid
+                //
                 break;
-            case QUEEN:
-                throw new RuntimeException("QUEEN movement");
+            case QUEEN: // combo of rook and bishop
+                System.out.println("QUEEN");
                 break;
-            case KING:
-                throw new RuntimeException("KING movement");
+            case KING: // up to 8 spaces surrounding piece
+                System.out.println("KING");
                 break;
         }
+
+        return moves;
     }
 }
