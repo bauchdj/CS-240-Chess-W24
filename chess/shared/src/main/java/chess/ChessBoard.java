@@ -21,8 +21,8 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        int row = position.getRow();
-        int col = position.getColumn();
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
         board[row][col] = piece;
     }
 
@@ -34,8 +34,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        int row = position.getRow();
-        int col = position.getColumn();
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
 		int limit = BOARD_SIZE - 1;
 		if (row < 0 || row > limit|| col < 0 || col > limit) return null;
         return board[row][col];
@@ -50,10 +50,10 @@ public class ChessBoard {
 
         for (int i = 0; i < BOARD_SIZE; i++) {
             ChessPiece.PieceType type = getPieceType(i);
-            board[0][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
-            board[1][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            board[6][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            board[7][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+            board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+            board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
         }
     }
 
