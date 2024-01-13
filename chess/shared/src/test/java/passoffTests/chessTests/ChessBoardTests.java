@@ -42,6 +42,27 @@ public class ChessBoardTests {
         var actualBoard = getNewBoard();
         actualBoard.resetBoard();
 
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                var epiece = expectedBoard.getPiece(new ChessPosition(i, j));
+                var apiece = actualBoard.getPiece(new ChessPosition(i, j));
+                ChessPiece.PieceType etype = null;
+                ChessPiece.PieceType atype = null;
+                ChessGame.TeamColor ecolor = null;
+                ChessGame.TeamColor acolor = null;
+                if (epiece != null) {
+                    etype = epiece.getPieceType();
+                    atype = apiece.getPieceType();
+                    ecolor = epiece.getTeamColor();
+                    acolor = apiece.getTeamColor();
+                }
+                String e = etype + ":" + ecolor;
+                String a = atype + ":" + acolor;
+                if (!a.equals(e)) { System.out.println("\nDIFF!!! -> " + e + " | " + a + "\n"); break; }
+                System.out.println(">>> Row: " + i + ", Col: " + j + " | Expected: " + e + ", Actual: " + a);
+            }
+        }
+
         Assertions.assertEquals(expectedBoard, actualBoard);
     }
 

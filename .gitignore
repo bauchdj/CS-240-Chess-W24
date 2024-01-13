@@ -29,5 +29,5 @@ bin/
 .DS_Store
 
 240-repo
-*.old
-*.disabled
+*old
+*disabled
