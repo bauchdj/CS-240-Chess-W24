@@ -51,7 +51,7 @@ public class ChessPiece {
 
     public boolean firstMove(int row) {
         int initialRow = this.color == ChessGame.TeamColor.WHITE ? 2 : 7;
-        return row == initialRow && this.beenMoved;
+        return row == initialRow && !this.beenMoved;
     }
 
     /**
@@ -117,32 +117,41 @@ public class ChessPiece {
         }
     }
 
-    private static void addValidMovePAWN(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves, boolean captureOpponent) {
-        // TODO PAWN move forward if no piece is there
-        if (!captureOpponent && noPieceAtRowCol(board, row, col)) {
-            addMove(myPosition, row, col, moves);
+    private static boolean addValidMovePAWN(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves, boolean captureOpponent) {
+        if (isValidIndex(row, col)) {
+            // TODO PAWN move forward if no piece is there
+            if (!captureOpponent && noPieceAtRowCol(board, row, col)) {
+                addMove(myPosition, row, col, moves);
+                return true;
+            }
+            // TODO PAWN move diagonal if opponent is there
+            if (captureOpponent && isOpponentAtRowCol(board, myPosition, row, col)) {
+                addMove(myPosition, row, col, moves);
+                return true;
+            }
         }
-        // TODO PAWN move diagonal if opponent is there
-        if (captureOpponent && isOpponentAtRowCol(board, myPosition, row, col)) {
-            addMove(myPosition, row, col, moves);
-        }
+        return false;
     }
 
     private static void pawnMove(ChessBoard board, ChessGame.TeamColor color, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         System.out.println("PAWN");
         int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
         int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 7 : 0;
-        // TODO 1 forward
         int newRow = row + forward;
-        if (isValidIndex(newRow, col)) addValidMovePAWN(board, myPosition, newRow, col, moves, false);
-        // TODO 1 forward-right || 1 forward-left if opponent there
+        // TODO 1 forward-left || 1 forward-right if opponent there
+        // TODO Future tests may require RIGHT then LEFT (-1, 1 is LEFT then RIGHT)
         for (int i = -1; i < 2; i += 2) {
             int newCol = col + i;
-            if (isValidIndex(newRow, newCol)) addValidMovePAWN(board, myPosition, newRow, newCol, moves, true);
+            addValidMovePAWN(board, myPosition, newRow, newCol, moves, true);
         }
+        // TODO 1 forward
+        boolean movedForwardOne = addValidMovePAWN(board, myPosition, newRow, col, moves, false);
         // TODO first move allows 2 forward and 1 forward
-        newRow += forward;
-        if (board.getPiece(myPosition).firstMove(myPosition.getRow()) && isValidIndex(newRow, col)) addValidMovePAWN(board, myPosition, newRow, col, moves, false);
+        if (movedForwardOne) {
+            newRow += forward;
+            boolean isFirstMove = board.getPiece(myPosition).firstMove(myPosition.getRow());
+            if (isFirstMove) addValidMovePAWN(board, myPosition, newRow, col, moves, false);
+        }
     }
 
     private static void sideToSideMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
