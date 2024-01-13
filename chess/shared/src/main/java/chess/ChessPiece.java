@@ -136,6 +136,7 @@ public class ChessPiece {
     private static void pawnMove(ChessBoard board, ChessGame.TeamColor color, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         System.out.println("PAWN");
         int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        // TODO Add promotion function
         int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 7 : 0;
         int newRow = row + forward;
         // TODO 1 forward-left || 1 forward-right if opponent there
