@@ -55,23 +55,13 @@ public class ChessBoard {
     }
 
     private static ChessPiece.PieceType getPieceType(int i) {
-        ChessPiece.PieceType type = null;
-
-        switch (i) {
-            case 0:
-            case 7:
-                type = ChessPiece.PieceType.ROOK;
-            case 1:
-            case 6:
-                type = ChessPiece.PieceType.KNIGHT;
-            case 2:
-            case 5:
-                type = ChessPiece.PieceType.BISHOP;
-            case 3:
-                type = ChessPiece.PieceType.QUEEN;
-            case 4:
-                type = ChessPiece.PieceType.KING;
-        }
-        return type;
-    }
+		return switch (i) {
+			case 0, 7 -> ChessPiece.PieceType.ROOK;
+			case 1, 6 -> ChessPiece.PieceType.KNIGHT;
+			case 2, 5 -> ChessPiece.PieceType.BISHOP;
+			case 3 -> ChessPiece.PieceType.QUEEN;
+			case 4 -> ChessPiece.PieceType.KING;
+			default -> null;
+		};
+	}
 }
