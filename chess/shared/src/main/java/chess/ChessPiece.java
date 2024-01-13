@@ -98,7 +98,7 @@ public class ChessPiece {
 
     private static boolean isOpponentAtRowCol(ChessBoard board, ChessPosition myPosition, int row, int col) {
         ChessPiece piece = pieceAtRowCol(board, row, col);
-        return piece.color != board.getPiece(myPosition).color;
+        return piece != null && piece.color != board.getPiece(myPosition).color;
     }
 
     private static void addMove(ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
