@@ -42,6 +42,7 @@ public class ChessBoardTests {
         var actualBoard = getNewBoard();
         actualBoard.resetBoard();
 
+        /*
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 var epiece = expectedBoard.getPiece(new ChessPosition(i, j));
@@ -62,6 +63,7 @@ public class ChessBoardTests {
                 System.out.println(">>> Row: " + i + ", Col: " + j + " | Expected: " + e + ", Actual: " + a);
             }
         }
+        */
 
         Assertions.assertEquals(expectedBoard, actualBoard);
     }

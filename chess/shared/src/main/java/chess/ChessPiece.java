@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -132,7 +133,7 @@ public class ChessPiece {
     private static void pawnMove(ChessBoard board, ChessGame.TeamColor color, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         System.out.println("PAWN");
         int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        // TODO Add promotion function
+        // TODO Add promotion function : You should have 4 moves, one of each type (QUEEN, ROOK, BISHOP, KNIGHT)
         int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 7 : 0;
         int newRow = row + forward;
         // TODO 1 forward-left || 1 forward-right if opponent there
@@ -178,5 +179,27 @@ public class ChessPiece {
         // up to 8 places: 1 forward, right, back, left &&
         // forward-right/right-forward, forward-left/left-forward, back-right/right-back, back-left/left-back
         System.out.println("KING");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return beenMoved == that.beenMoved && color == that.color && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, type, beenMoved);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "color=" + color +
+                ", type=" + type +
+                ", beenMoved=" + beenMoved +
+                '}';
     }
 }

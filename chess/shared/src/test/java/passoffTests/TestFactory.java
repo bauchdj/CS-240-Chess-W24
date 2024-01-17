@@ -65,12 +65,14 @@ public class TestFactory {
         var testPiece = board.getPiece(startPosition);
         var validMoves = loadMoves(startPosition, endPositions);
 
+        /*
         for (ChessMove move : validMoves) {
             ChessPosition startPos = move.getStartPosition();
             System.out.println("Start " + startPos.getRow() + " " + startPos.getColumn());
             ChessPosition endPos = move.getEndPosition();
             System.out.println("End " + endPos.getRow() + " " + endPos.getColumn());
         }
+        */
 
 		// My version of the variable, not a HashSet like the Professors added
         //Collection<ChessMove> pieceMoves = testPiece.pieceMoves(board, startPosition);
@@ -78,12 +80,14 @@ public class TestFactory {
 		// New version 13 Jan 2024
 		var pieceMoves = new HashSet<>(testPiece.pieceMoves(board, startPosition));
 
+        /*
         for (ChessMove move : pieceMoves) {
             ChessPosition startPos = move.getStartPosition();
             System.out.println("start " + startPos.getRow() + " " + startPos.getColumn());
             ChessPosition endPos = move.getEndPosition();
             System.out.println("end " + endPos.getRow() + " " + endPos.getColumn());
         }
+        */
 
 		// New version 13 Jan 2024
 		Assertions.assertEquals(validMoves, pieceMoves, "Wrong moves");
