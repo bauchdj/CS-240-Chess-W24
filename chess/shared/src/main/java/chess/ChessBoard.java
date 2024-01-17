@@ -44,7 +44,7 @@ public class ChessBoard {
 
 	public static boolean isValidRowCol(int row, int col) {
 		int limit = BOARD_SIZE - 1;
-		return row < 0 || row > limit|| col < 0 || col > limit;
+		return row < 0 || row > limit || col < 0 || col > limit;
 	}
 
 	/**

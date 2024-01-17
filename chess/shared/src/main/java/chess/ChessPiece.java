@@ -83,7 +83,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private static boolean isValidIndex(int row, int col) { return !ChessBoard.isValidRowCol(row, col); }
+    private static boolean isValidIndex(int row, int col) { return !ChessBoard.isValidRowCol(row - 1, col - 1); }
 
     private static ChessPiece pieceAtRowCol(ChessBoard board, int row, int col) {
         ChessPosition pos = new ChessPosition(row, col);
@@ -98,6 +98,17 @@ public class ChessPiece {
         return piece != null && piece.color != board.getPiece(myPosition).color;
     }
 
+    private static void addPromotionMovesPAWN(ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
+        ChessPosition newPos = new ChessPosition(row, col);
+        ChessMove queenMove = new ChessMove(myPosition, newPos, PieceType.QUEEN);
+        moves.add(queenMove);
+        ChessMove bishopMove = new ChessMove(myPosition, newPos, PieceType.BISHOP);
+        moves.add(bishopMove);
+        ChessMove rookMove = new ChessMove(myPosition, newPos, PieceType.ROOK);
+        moves.add(rookMove);
+        ChessMove knightMove = new ChessMove(myPosition, newPos, PieceType.KNIGHT);
+        moves.add(knightMove);
+    }
     private static void addMove(ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         ChessPosition newPos = new ChessPosition(row, col);
         ChessMove move = new ChessMove(myPosition, newPos, null);
@@ -114,16 +125,20 @@ public class ChessPiece {
         }
     }
 
-    private static boolean addValidMovePAWN(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves, boolean captureOpponent) {
+    private static boolean addValidMovePAWN(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves, int oppositeSide, boolean captureOpponent) {
         if (isValidIndex(row, col)) {
-            // TODO PAWN move forward if no piece is there
+            // TODO If opposite side then I need to add 4 moves for QUEEN, BISHOP, ROOK, KNIGHT
+            boolean promote = row == oppositeSide;
+			// TODO PAWN move forward if no piece is there
             if (!captureOpponent && noPieceAtRowCol(board, row, col)) {
-                addMove(myPosition, row, col, moves);
+                if (promote) { addPromotionMovesPAWN(myPosition, row, col, moves); }
+                else { addMove(myPosition, row, col, moves); }
                 return true;
             }
             // TODO PAWN move diagonal if opponent is there
             if (captureOpponent && isOpponentAtRowCol(board, myPosition, row, col)) {
-                addMove(myPosition, row, col, moves);
+                if (promote) { addPromotionMovesPAWN(myPosition, row, col, moves); }
+                else { addMove(myPosition, row, col, moves); }
                 return true;
             }
         }
@@ -131,24 +146,24 @@ public class ChessPiece {
     }
 
     private static void pawnMove(ChessBoard board, ChessGame.TeamColor color, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
-        System.out.println("PAWN");
+        // System.out.println("PAWN");
         int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
         // TODO Add promotion function : You should have 4 moves, one of each type (QUEEN, ROOK, BISHOP, KNIGHT)
-        int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 7 : 0;
+        int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
         int newRow = row + forward;
         // TODO 1 forward-left || 1 forward-right if opponent there
         // TODO Future tests may require RIGHT then LEFT (-1, 1 is LEFT then RIGHT)
         for (int i = -1; i < 2; i += 2) {
             int newCol = col + i;
-            addValidMovePAWN(board, myPosition, newRow, newCol, moves, true);
+            addValidMovePAWN(board, myPosition, newRow, newCol, moves, oppositeSide, true);
         }
         // TODO 1 forward
-        boolean movedForwardOne = addValidMovePAWN(board, myPosition, newRow, col, moves, false);
+        boolean movedForwardOne = addValidMovePAWN(board, myPosition, newRow, col, moves, oppositeSide, false);
         // TODO first move allows 2 forward and 1 forward
         if (movedForwardOne) {
             newRow += forward;
             boolean isFirstMove = board.getPiece(myPosition).firstMove(myPosition.getRow());
-            if (isFirstMove) addValidMovePAWN(board, myPosition, newRow, col, moves, false);
+            if (isFirstMove) addValidMovePAWN(board, myPosition, newRow, col, moves, oppositeSide, false);
         }
     }
 
