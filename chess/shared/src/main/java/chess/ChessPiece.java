@@ -212,7 +212,7 @@ public class ChessPiece {
     }
     private static void knightMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // up to 8 places: 2 in one direction, 1 in the other
-        System.out.println("KNIGHT");
+        //System.out.println("KNIGHT");
         addValidMove(board, myPosition, row + 2, col + 1, moves);
         addValidMove(board, myPosition, row + 2, col - 1, moves);
         addValidMove(board, myPosition, row - 2, col + 1, moves);
@@ -227,7 +227,7 @@ public class ChessPiece {
     private static void kingMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // up to 8 places: 1 forward, right, back, left &&
         // forward-right/right-forward, forward-left/left-forward, back-right/right-back, back-left/left-back
-        System.out.println("KING");
+        //System.out.println("KING");
         addValidMove(board, myPosition, row + 1, col, moves);
         addValidMove(board, myPosition, row - 1, col, moves);
         addValidMove(board, myPosition, row, col + 1, moves);
