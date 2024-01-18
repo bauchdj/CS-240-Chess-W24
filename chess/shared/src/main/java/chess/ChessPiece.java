@@ -89,8 +89,14 @@ public class ChessPiece {
         ChessPosition pos = new ChessPosition(row, col);
         return board.getPiece(pos);
     }
+
     private static boolean noPieceAtRowCol(ChessBoard board, int row, int col) {
         return pieceAtRowCol(board, row, col) == null;
+    }
+
+    private static boolean isTeamAtRowCol(ChessBoard board, ChessPosition myPosition, int row, int col) {
+        ChessPiece piece = pieceAtRowCol(board, row, col);
+        return piece != null && piece.color == board.getPiece(myPosition).color;
     }
 
     private static boolean isOpponentAtRowCol(ChessBoard board, ChessPosition myPosition, int row, int col) {
@@ -113,16 +119,6 @@ public class ChessPiece {
         ChessPosition newPos = new ChessPosition(row, col);
         ChessMove move = new ChessMove(myPosition, newPos, null);
         moves.add(move);
-    }
-
-    private static void addValidMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
-        if (isValidIndex(row, col)) {
-            //boolean isOpponentThere = isPieceAtRowCol(board, row, col); // TODO function separate for pieces: opponent vs you
-            // TODO Cannot move if same color
-            //if () {
-            //    addMove(myPosition, row, col, moves);
-            //}
-        }
     }
 
     private static boolean addValidMovePAWN(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves, int oppositeSide, boolean captureOpponent) {
@@ -148,11 +144,10 @@ public class ChessPiece {
     private static void pawnMove(ChessBoard board, ChessGame.TeamColor color, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // System.out.println("PAWN");
         int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        // TODO Add promotion function : You should have 4 moves, one of each type (QUEEN, ROOK, BISHOP, KNIGHT)
+        // TODO promotion function : 4 moves, one of each type (QUEEN, ROOK, BISHOP, KNIGHT)
         int oppositeSide = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
         int newRow = row + forward;
         // TODO 1 forward-left || 1 forward-right if opponent there
-        // TODO Future tests may require RIGHT then LEFT (-1, 1 is LEFT then RIGHT)
         for (int i = -1; i < 2; i += 2) {
             int newCol = col + i;
             addValidMovePAWN(board, myPosition, newRow, newCol, moves, oppositeSide, true);
@@ -167,33 +162,80 @@ public class ChessPiece {
         }
     }
 
+    private static void fullBoardMove(ChessBoard board, ChessPosition myPosition, int row, int col, int rowDelta, int colDelta, Collection<ChessMove> moves) {
+        row = row + rowDelta;
+        col = col + colDelta;
+
+        while (isValidIndex(row, col)) {
+            if (isOpponentAtRowCol(board, myPosition, row, col)) {
+                addMove(myPosition, row, col, moves);
+                break;
+            } else if (noPieceAtRowCol(board, row, col)) {
+                addMove(myPosition, row, col, moves);
+                row = row + rowDelta;
+                col = col + colDelta;
+            } else {
+                break;
+            }
+        }
+    }
+
     private static void sideToSideMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // moves side to side
-        System.out.println("ROOK");
-        // Calc where I can move
-        // Create ChessMove Object if move valid
-        //
+        //System.out.println("ROOK");
+        fullBoardMove(board, myPosition, row, col, 1, 0, moves);
+        fullBoardMove(board, myPosition, row, col, -1, 0, moves);
+        fullBoardMove(board, myPosition, row, col, 0, 1, moves);
+        fullBoardMove(board, myPosition, row, col, 0, -1, moves);
     }
 
     private static void diagonalMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // moves diagonally
-        System.out.println("BISHOP");
+        //System.out.println("BISHOP");
+        fullBoardMove(board, myPosition, row, col, 1, 1, moves);
+        fullBoardMove(board, myPosition, row, col, 1, -1, moves);
+        fullBoardMove(board, myPosition, row, col, -1, 1, moves);
+        fullBoardMove(board, myPosition, row, col, -1, -1, moves);
     }
 
     private static void queenMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // moves side to side || diagonally
-        System.out.println("QUEEN");
+        //System.out.println("QUEEN");
+        sideToSideMove(board, myPosition, row, col, moves);
+        diagonalMove(board, myPosition, row, col, moves);
     }
 
+    private static void addValidMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
+        boolean validPos = isValidIndex(row, col);
+        boolean notMyTeam = !isTeamAtRowCol(board, myPosition, row, col);
+        if (validPos && notMyTeam) { addMove(myPosition, row, col, moves); }
+    }
     private static void knightMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // up to 8 places: 2 in one direction, 1 in the other
         System.out.println("KNIGHT");
+        addValidMove(board, myPosition, row + 2, col + 1, moves);
+        addValidMove(board, myPosition, row + 2, col - 1, moves);
+        addValidMove(board, myPosition, row - 2, col + 1, moves);
+        addValidMove(board, myPosition, row - 2, col - 1, moves);
+        addValidMove(board, myPosition, row + 1, col + 2, moves);
+        addValidMove(board, myPosition, row - 1, col + 2, moves);
+        addValidMove(board, myPosition, row + 1, col - 2, moves);
+        addValidMove(board, myPosition, row - 1, col - 2, moves);
+
     }
 
     private static void kingMove(ChessBoard board, ChessPosition myPosition, int row, int col, Collection<ChessMove> moves) {
         // up to 8 places: 1 forward, right, back, left &&
         // forward-right/right-forward, forward-left/left-forward, back-right/right-back, back-left/left-back
         System.out.println("KING");
+        addValidMove(board, myPosition, row + 1, col, moves);
+        addValidMove(board, myPosition, row - 1, col, moves);
+        addValidMove(board, myPosition, row, col + 1, moves);
+        addValidMove(board, myPosition, row, col - 1, moves);
+        addValidMove(board, myPosition, row + 1, col + 1, moves);
+        addValidMove(board, myPosition, row + 1, col - 1, moves);
+        addValidMove(board, myPosition, row - 1, col + 1, moves);
+        addValidMove(board, myPosition, row - 1, col - 1, moves);
     }
 
     @Override
