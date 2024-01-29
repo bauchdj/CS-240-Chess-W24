@@ -10,10 +10,22 @@ import java.util.Arrays;
  */
 public class ChessBoard {
     private ChessPiece[][] board;
-	private static final int BOARD_SIZE = 8;
+    private static final int BOARD_SIZE = 8;
 
     public ChessBoard() {
-		board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+        board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+    }
+
+    /**
+     * Checks if position is valid, within range of 1-8
+     *
+     * @param pos position to check
+     * @return true if position is in range 1-8
+     */
+    static public boolean isValidPosition(ChessPosition pos) {
+        int row = pos.getRow();
+        int col = pos.getColumn();
+        return !(row < 1 || row > 8 || col < 1 || col > 8);
     }
 
     /**
@@ -25,7 +37,9 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
-        board[row][col] = piece;
+        if (isValidPosition(position)) {
+            board[row][col] = piece;
+        }
     }
 
     /**
@@ -38,60 +52,61 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int row = position.getRow() - 1;
         int col = position.getColumn() - 1;
-		if (isValidRowCol(row, col)) return null;
+        if (!isValidPosition(position)) return null;
         return board[row][col];
     }
 
-	public static boolean isValidRowCol(int row, int col) {
-		int limit = BOARD_SIZE - 1;
-		return row < 0 || row > limit || col < 0 || col > limit;
-	}
-
-	/**
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
         board = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
 
+        // Pawns both teams
         for (int i = 0; i < BOARD_SIZE; i++) {
-            ChessPiece.PieceType type = getPieceType(i);
-            board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
         }
+
+        // White
+        board[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        board[0][1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[0][2] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        board[0][4] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        board[0][5] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[0][6] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[0][7] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+
+        // Black
+        board[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        board[7][1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[7][2] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        board[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        board[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
     }
 
-    private static ChessPiece.PieceType getPieceType(int i) {
-		return switch (i) {
-			case 0, 7 -> ChessPiece.PieceType.ROOK;
-			case 1, 6 -> ChessPiece.PieceType.KNIGHT;
-			case 2, 5 -> ChessPiece.PieceType.BISHOP;
-			case 3 -> ChessPiece.PieceType.QUEEN;
-			case 4 -> ChessPiece.PieceType.KING;
-			default -> null;
-		};
-	}
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "board=" + Arrays.toString(board) +
+                '}';
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		ChessBoard that = (ChessBoard) o;
-		return Arrays.deepEquals(board, that.board);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(board, that.board);
+    }
 
-	@Override
-	public int hashCode() {
-		return Arrays.deepHashCode(board);
-	}
-
-	// TODO Edit to print the board rows and columns and ChessPieces on the board
-	@Override
-	public String toString() {
-		return "ChessBoard{" +
-				"board=" + Arrays.toString(board) +
-				'}';
-	}
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
 }
