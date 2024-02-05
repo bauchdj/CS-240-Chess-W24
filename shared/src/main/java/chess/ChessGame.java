@@ -189,25 +189,48 @@ public class ChessGame {
         }
     }
 
-    private static void enPassantValidMoves(ChessBoard board, ChessMove lastMove, Collection<ChessMove> moves, ChessPiece piece) {
+    private void enPassantValidMoves(ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
-        ChessPosition lastPos = lastMove.getEndPosition();
-        ChessPiece lastPiece = board.getPiece(lastPos);
+        ChessPosition lastPos = this.lastMove.getEndPosition();
+        ChessPiece lastPiece = this.board.getPiece(lastPos);
         if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
         int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 4 : 5;
         if (lastPos.getRow() != opposingPawnRow) return;
+        if (startPos.getRow() != opposingPawnRow) return;
 
-        ChessPosition yourPos = move.getStartPosition();
-        if (yourPos.getRow() != opposingPawnRow) return;
+        ChessBoard prevBoard = this.board;
+        this.board = prevBoard.copy();
 
         int forward = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
-        ChessPosition endPos = move.getEndPosition();
-        // TODO If you move 1 forward and to the same column as opponent PAWN
-        if (!(endPos.getRow() == (opposingPawnRow + forward) && endPos.getColumn() == lastPos.getColumn())) return;
+        ChessMove move = new ChessMove(startPos, new ChessPosition(opposingPawnRow + forward, lastPos.getColumn()), null);
 
-        //
+        try { movePiece(this.board, move); }
+        catch (InvalidMoveException e) { throw new RuntimeException(e); }
+
+        boolean check = false;
+        if (isInCheck(piece.getTeamColor())) check = true;
+
+        this.board = prevBoard;
+        if (check) return;
+
+        moves.add(move);
+/*
+        for (ChessMove m : moves) {
+            boolean sameRowOpponentPawn = m.getStartPosition().getRow() == opposingPawnRow;
+            boolean behindOpponentPawn = m.getEndPosition().getColumn() == lastPos.getColumn() && m.getEndPosition().getRow() == (opposingPawnRow + forward);
+            if (sameRowOpponentPawn && behindOpponentPawn) {
+                move = m;
+                break;
+            }
+        }
+
+        if (move == null) return;
+
+        ChessPosition endPos = new ChessPosition();
+        moves.add(new ChessMove(move.getStartPosition(), endPos, null));
+ */
     }
 
     /**
@@ -239,7 +262,7 @@ public class ChessGame {
 
         // TODO Castling - add those moves
         if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) castling(piece, startPosition, moves);
-        enPassantValidMoves(this.board, this.lastMove, moves, piece);
+        enPassantValidMoves(startPosition, piece, moves);
 
         this.board = ogBoard;
         return moves;
