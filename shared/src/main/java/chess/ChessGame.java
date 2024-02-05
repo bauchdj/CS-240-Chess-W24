@@ -40,12 +40,12 @@ public class ChessGame {
         BLACK
     }
 
-    private static void doForMoves(Collection<ChessMove> moves, Predicate<Iterator<ChessMove>> predicate) {
+    /*private static void doForMoves(Collection<ChessMove> moves, Predicate<Iterator<ChessMove>> predicate) {
         Iterator<ChessMove> moveIterator = moves.iterator();
         while (moveIterator.hasNext()) {
             predicate.test(moveIterator);
         }
-    }
+    }*/
 
     private static void movePiece(ChessBoard board, ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
@@ -58,45 +58,6 @@ public class ChessGame {
 
         board.addPiece(endPos, piece);
         board.addPiece(startPos, null);
-    }
-
-    private static void moveBack(ChessBoard board, ChessMove move) throws InvalidMoveException {
-        movePiece(board, new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
-    }
-
-    /**
-     * Gets a valid moves for a piece at the given location
-     *
-     * @param startPosition the piece to get valid moves for
-     * @return Set of valid moves for requested piece, or null if no piece at
-     * startPosition
-     */
-    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // TODO loop through each move, apply said move to board, and see if current team is in check.
-        // TODO if they are in check then that move must be removed.
-        ChessBoard ogBoard = this.board;
-        this.board = ogBoard.copy();
-        ChessPiece piece = this.board.getPiece(startPosition);
-        Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
-
-        //ChessGame.doForMoves(moves, moveIterator -> {
-        Iterator<ChessMove> moveIterator = moves.iterator();
-        while (moveIterator.hasNext()) {
-            ChessMove move = moveIterator.next();
-            try { movePiece(this.board, move); }
-            catch (InvalidMoveException e) { throw new RuntimeException(e); }
-
-            if (isInCheck(piece.getTeamColor())) moveIterator.remove();
-
-            try { moveBack(this.board, move); }
-            catch (InvalidMoveException e) { throw new RuntimeException(e); }
-        }
-            // Intellij asked me to include return
-			//return false;}
-		//});
-
-        this.board = ogBoard;
-        return moves;
     }
 
     private static ChessPosition findKing(ChessBoard board, TeamColor teamColor) {
@@ -116,11 +77,10 @@ public class ChessGame {
         if (kingPos == null) return false;
 
         for (int row = 1; row < 9; ++row) {
-            for (int column = 1; column < 9; ++ column) {
+            for (int column = 1; column < 9; ++column) {
                 ChessPosition pos = new ChessPosition(row, column);
                 ChessPiece piece = board.getPiece(pos);
                 if (piece == null) continue;
-
                 if (piece.getTeamColor() == teamColor) continue;
 
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
@@ -142,16 +102,47 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        TeamColor opponentColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        //TeamColor opponentColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
         // TODO Could be wrong? IDK
         // TODO you are not in check IF you can take their KING
         //if (isKingOfTeamInCheck(this.board, opponentColor)) return false;
 
-        // TODO you are in check IF you can't take opponents KING and they can take your KING
+        // TODO you are in check IF they can take your KING
         if (isKingOfTeamInCheck(this.board, teamColor)) return true;
 
         return false;
+    }
+
+    /**
+     * Gets a valid moves for a piece at the given location
+     *
+     * @param startPosition the piece to get valid moves for
+     * @return Set of valid moves for requested piece, or null if no piece at
+     * startPosition
+     */
+    public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        ChessBoard ogBoard = this.board;
+        this.board = ogBoard.copy();
+        ChessPiece piece = this.board.getPiece(startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
+
+        Iterator<ChessMove> moveIterator = moves.iterator();
+        while (moveIterator.hasNext()) {
+            ChessBoard prevBoard = this.board;
+            this.board = prevBoard.copy();
+
+            ChessMove move = moveIterator.next();
+            try { movePiece(this.board, move); }
+            catch (InvalidMoveException e) { throw new RuntimeException(e); }
+
+            if (isInCheck(piece.getTeamColor())) moveIterator.remove();
+
+            this.board = prevBoard;
+        }
+
+        this.board = ogBoard;
+        return moves;
     }
 
     private static boolean isMoveinSet(Collection<ChessMove> moves, ChessMove move) {
@@ -175,17 +166,6 @@ public class ChessGame {
     }
 
     /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
-    public boolean isInCheckmate(TeamColor teamColor) {
-        // TODO if all team pieces move and still in check then Checkmate baby
-        return false;
-    }
-
-    /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves
      *
@@ -194,7 +174,30 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         // TODO if there are 0 validMoves for all team pieces
-        return false;
+        for (int row = 1; row < 9; ++row) {
+            for (int column = 1; column < 9; ++column) {
+                ChessPosition pos = new ChessPosition(row, column);
+                ChessPiece piece = this.board.getPiece(pos);
+                if (piece == null) continue;
+                if (piece.getTeamColor() != teamColor) continue;
+
+                Collection<ChessMove> moves = validMoves(pos);
+                if (!moves.isEmpty()) return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determines if the given team is in checkmate
+     *
+     * @param teamColor which team to check for checkmate
+     * @return True if the specified team is in checkmate
+     */
+    public boolean isInCheckmate(TeamColor teamColor) {
+        // TODO if in check and all team pieces move and still in check
+        if (!isInCheck(teamColor)) return false;
+        return isInStalemate(teamColor);
     }
 
     /**

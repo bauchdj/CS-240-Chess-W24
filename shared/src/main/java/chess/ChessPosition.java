@@ -35,10 +35,11 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "ChessPosition{" +
+        return "(" + row + ", " + col + ")";
+        /*return "ChessPosition{" +
                 "row=" + row +
                 ", col=" + col +
-                '}';
+                '}';*/
     }
 
     @Override
