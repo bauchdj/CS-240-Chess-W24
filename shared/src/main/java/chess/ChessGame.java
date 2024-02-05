@@ -119,7 +119,7 @@ public class ChessGame {
         ChessPiece queenSideRook = this.board.getPiece(new ChessPosition(row, 1));
         ChessPiece kingSideRook = this.board.getPiece(new ChessPosition(row, 8));
 
-        if (!queenSideRook.getBeenMoved()) {
+        if (queenSideRook != null && !queenSideRook.getBeenMoved()) {
             boolean isPieceInBetween = false;
             for (int col = 2; col < 5; ++col) {
                 if (this.board.getPiece(new ChessPosition(row, col)) != null) {
@@ -152,7 +152,7 @@ public class ChessGame {
             }
         }
 
-        if (!kingSideRook.getBeenMoved()) {
+        if (kingSideRook != null && !kingSideRook.getBeenMoved()) {
             boolean isPieceInBetween = false;
             for (int col = 6; col < 8; ++col) {
                 if (board.getPiece(new ChessPosition(row, col)) != null) {
@@ -252,7 +252,6 @@ public class ChessGame {
 
         this.board = ogBoard;
 
-        System.out.println(moves);
         return moves;
     }
 
