@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor currentTeam;
+    private ChessMove lastMove;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -188,6 +189,27 @@ public class ChessGame {
         }
     }
 
+    private static void enPassantValidMoves(ChessBoard board, ChessMove lastMove, Collection<ChessMove> moves, ChessPiece piece) {
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
+
+        ChessPosition lastPos = lastMove.getEndPosition();
+        ChessPiece lastPiece = board.getPiece(lastPos);
+        if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
+
+        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 4 : 5;
+        if (lastPos.getRow() != opposingPawnRow) return;
+
+        ChessPosition yourPos = move.getStartPosition();
+        if (yourPos.getRow() != opposingPawnRow) return;
+
+        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
+        ChessPosition endPos = move.getEndPosition();
+        // TODO If you move 1 forward and to the same column as opponent PAWN
+        if (!(endPos.getRow() == (opposingPawnRow + forward) && endPos.getColumn() == lastPos.getColumn())) return;
+
+        //
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -215,11 +237,33 @@ public class ChessGame {
             this.board = prevBoard;
         }
 
+        // TODO Castling - add those moves
         if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) castling(piece, startPosition, moves);
-        //if (piece.getPieceType() == ChessPiece.PieceType.PAWN) = enPassant(this.board, piece, moves);
+        enPassantValidMoves(this.board, this.lastMove, moves, piece);
 
         this.board = ogBoard;
         return moves;
+    }
+
+    private static void enPassantMove(ChessBoard board, ChessMove lastMove, ChessMove move, ChessPiece piece) {
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
+
+        ChessPosition lastPos = lastMove.getEndPosition();
+        ChessPiece lastPiece = board.getPiece(lastPos);
+        if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
+
+        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 4 : 5;
+        if (lastPos.getRow() != opposingPawnRow) return;
+
+        ChessPosition yourPos = move.getStartPosition();
+        if (yourPos.getRow() != opposingPawnRow) return;
+
+        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
+        ChessPosition endPos = move.getEndPosition();
+        // TODO If you move 1 forward and to the same column as opponent PAWN
+        if (!(endPos.getRow() == (opposingPawnRow + forward) && endPos.getColumn() == lastPos.getColumn())) return;
+
+        board.addPiece(lastPos, null);
     }
 
     private static boolean isMoveInSet(Collection<ChessMove> moves, ChessMove move) {
@@ -240,6 +284,7 @@ public class ChessGame {
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
         if (!isMoveInSet(moves, move)) throw new InvalidMoveException("Invalid move attempted");
 
+        // TODO Castling - Move ROOK according to move
         if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) {
             ChessPosition pos = move.getEndPosition();
             int row = pos.getRow();
@@ -254,6 +299,10 @@ public class ChessGame {
             }
         }
 
+        // TODO En Passant - If last move was opposing team's PAWN 2 forward && your PAWN next to them col:(-1, +1) && you move row(+1) THEN remove PAWN of opponent
+        enPassantMove(this.board, this.lastMove, move, piece);
+
+        this.lastMove = move;
         movePiece(this.board, move);
         piece.pieceMoved();
     }
