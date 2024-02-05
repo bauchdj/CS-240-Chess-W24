@@ -61,8 +61,8 @@ public class ChessBoard {
 
         for (int row = 0; row < BOARD_SIZE; ++row) {
             for (int column = 0; column < BOARD_SIZE; ++column) {
-                ChessPosition pos = new ChessPosition(row, column);
                 ChessPiece piece = board[row][column];
+                ChessPosition pos = new ChessPosition(row + 1, column + 1);
                 boardCopy.addPiece(pos, piece);
             }
         }
@@ -106,9 +106,20 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n|");
+
+        for (int row = 7; row >= 0; --row) {
+            for (int column = 0; column < BOARD_SIZE; ++column) {
+                ChessPiece piece = board[row][column];
+                builder.append(piece != null ? piece.toString() : " ");
+                builder.append("|");
+            }
+            if (row > 0) builder.append("\n|");
+        }
+
+        builder.append("\n");
+        return builder.toString();
     }
 
     @Override

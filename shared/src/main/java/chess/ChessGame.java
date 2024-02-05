@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
@@ -78,42 +79,30 @@ public class ChessGame {
         ChessPiece piece = this.board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
 
-        ChessGame.doForMoves(moves, moveIterator -> {
+        //ChessGame.doForMoves(moves, moveIterator -> {
+        Iterator<ChessMove> moveIterator = moves.iterator();
+        while (moveIterator.hasNext()) {
             ChessMove move = moveIterator.next();
-			try { movePiece(this.board, move); }
-            catch (InvalidMoveException e) { throw new RuntimeException(e); }
+            try {
+                movePiece(this.board, move);
+            } catch (InvalidMoveException e) {
+                throw new RuntimeException(e);
+            }
 
-			if (isInCheck(this.currentTeam)) moveIterator.remove();
+            if (isInCheck(piece.getTeamColor())) moveIterator.remove();
 
-			try { moveBack(this.board, move); }
-            catch (InvalidMoveException e) { throw new RuntimeException(e); }
+            try {
+                moveBack(this.board, move);
+            } catch (InvalidMoveException e) {
+                throw new RuntimeException(e);
+            }
+        }
             // Intellij asked me to include return
-			return false;
-		});
+			//return false;}
+		//});
 
         this.board = ogBoard;
         return moves;
-    }
-
-    private static boolean isMoveinSet(Collection<ChessMove> moves, ChessMove move) {
-        Iterator<ChessMove> moveIterator = moves.iterator();
-        while (moveIterator.hasNext()) {
-            ChessMove moveInMoves = moveIterator.next();
-            if (move == moveInMoves) return true;
-        }
-        return false;
-    }
-    /**
-     * Makes a move in a chess game
-     *
-     * @param move chess move to preform
-     * @throws InvalidMoveException if move is invalid
-     */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
-        // TODO see if move is in validMoves
-        Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if (isMoveinSet(moves, move)) movePiece(this.board, move);
-        throw new InvalidMoveException("Invalid move attempted");
     }
 
     private static ChessPosition findKing(ChessBoard board, TeamColor teamColor) {
@@ -121,11 +110,12 @@ public class ChessGame {
             for (int column = 1; column < 9; ++column) {
                 ChessPosition pos = new ChessPosition(row, column);
                 ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) return pos;
+                if (piece == null) continue;
+                if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) return pos;
             }
         }
         System.out.println("ERROR!!! Line 85 ChessGame : Should always find King, this should NEVER print.");
-        return new ChessPosition(1,1);
+        return null;
     }
 
     private static boolean isKingOfTeamInCheck(ChessBoard board, TeamColor teamColor) {
@@ -145,7 +135,7 @@ public class ChessGame {
 
                 while (moveIterator.hasNext()) {
                     ChessMove move = moveIterator.next();
-                    if (move.getEndPosition().equals(kingPos)) return true;
+                    if (kingPos.equals(move.getEndPosition())) return true;
                 }
             }
         }
@@ -169,6 +159,26 @@ public class ChessGame {
         if (isKingOfTeamInCheck(this.board, teamColor)) return true;
 
         return false;
+    }
+
+    private static boolean isMoveinSet(Collection<ChessMove> moves, ChessMove move) {
+        Iterator<ChessMove> moveIterator = moves.iterator();
+        while (moveIterator.hasNext()) if (move.equals(moveIterator.next())) return true;
+        return false;
+    }
+
+    /**
+     * Makes a move in a chess game
+     *
+     * @param move chess move to preform
+     * @throws InvalidMoveException if move is invalid
+     */
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        // TODO see if move is in validMoves
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if (!isMoveinSet(moves, move)) throw new InvalidMoveException("Invalid move attempted");
+        movePiece(this.board, move);
+        this.board.getPiece(move.getEndPosition()).pieceMoved();
     }
 
     /**
@@ -207,4 +217,25 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() { return this.board; }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "currentTeam=" + currentTeam + "\n" +
+                "board=" + board +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.deepEquals(board, chessGame.board) && currentTeam == chessGame.currentTeam;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, currentTeam);
+    }
 }

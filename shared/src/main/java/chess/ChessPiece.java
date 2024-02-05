@@ -220,11 +220,20 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "pieceColor=" + color +
-                ", type=" + type +
-                ", beenMoved=" + beenMoved +
-                '}';
+        char representation;
+		representation = switch (this.type) {
+			case PAWN -> 'p';
+			case KNIGHT -> 'n';
+			case BISHOP -> 'b';
+			case ROOK -> 'r';
+			case QUEEN -> 'q';
+			case KING -> 'k';
+		};
+
+
+        if (this.color == ChessGame.TeamColor.WHITE) representation = Character.toUpperCase(representation);
+
+        return String.valueOf(representation);
     }
 
     @Override
