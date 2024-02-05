@@ -47,6 +47,8 @@ public class ChessPiece {
         return this.type;
     }
 
+    public boolean getBeenMoved() { return this.beenMoved; }
+
     public void pieceMoved() {
         this.beenMoved = true;
     }

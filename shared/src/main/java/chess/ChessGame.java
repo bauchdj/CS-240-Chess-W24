@@ -3,7 +3,7 @@ package chess;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.Predicate;
+//import java.util.function.Predicate;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -84,12 +84,10 @@ public class ChessGame {
                 if (piece.getTeamColor() == teamColor) continue;
 
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                Iterator<ChessMove> moveIterator = moves.iterator();
 
-                while (moveIterator.hasNext()) {
-                    ChessMove move = moveIterator.next();
-                    if (kingPos.equals(move.getEndPosition())) return true;
-                }
+				for (ChessMove move : moves) {
+					if (kingPos.equals(move.getEndPosition())) return true;
+				}
             }
         }
 
@@ -114,6 +112,82 @@ public class ChessGame {
         return false;
     }
 
+    private void castling(ChessPiece piece, ChessPosition startPos, Collection<ChessMove> moves) {
+        // TODO Castling
+        int row = startPos.getRow();
+        ChessPiece queenSideRook = this.board.getPiece(new ChessPosition(row, 1));
+        ChessPiece kingSideRook = this.board.getPiece(new ChessPosition(row, 8));
+
+        if (!queenSideRook.getBeenMoved()) {
+            boolean isPieceInBetween = false;
+            for (int col = 2; col < 5; ++col) {
+                if (this.board.getPiece(new ChessPosition(row, col)) != null) {
+                    isPieceInBetween = true;
+                    break;
+                }
+            }
+
+            boolean isKingInCheckInBetween = false;
+            if (!isPieceInBetween) {
+                for (int col = 2; col < 5; ++col) {
+                    ChessBoard prevBoard = this.board;
+                    this.board = prevBoard.copy();
+
+                    ChessMove move = new ChessMove(startPos, new ChessPosition(row, col), null);
+                    try { movePiece(this.board, move); }
+                    catch (InvalidMoveException e) { throw new RuntimeException(e); }
+
+                    if (isInCheck(piece.getTeamColor())) {
+                        isKingInCheckInBetween = true;
+                        break;
+                    }
+
+                    this.board = prevBoard;
+                }
+
+                if (!isKingInCheckInBetween) {
+                    moves.add(new ChessMove(startPos, new ChessPosition(row, 3), null));
+                }
+            }
+        }
+
+        if (!kingSideRook.getBeenMoved()) {
+            boolean isPieceInBetween = false;
+            for (int col = 6; col < 8; ++col) {
+                if (board.getPiece(new ChessPosition(row, col)) != null) {
+                    isPieceInBetween = true;
+                    break;
+                }
+            }
+
+            boolean isKingInCheckInBetween = false;
+            if (!isPieceInBetween) {
+                for (int col = 6; col < 8; ++col) {
+                    ChessBoard prevBoard = this.board;
+                    this.board = prevBoard.copy();
+
+                    ChessMove move = new ChessMove(startPos, new ChessPosition(row, col), null);
+                    try {
+                        movePiece(this.board, move);
+                    } catch (InvalidMoveException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (isInCheck(piece.getTeamColor())) {
+                        isKingInCheckInBetween = true;
+                        break;
+                    }
+
+                    this.board = prevBoard;
+                }
+
+                if (!isKingInCheckInBetween) {
+                    moves.add(new ChessMove(startPos, new ChessPosition(row, 7), null));
+                }
+            }
+        }
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -126,8 +200,6 @@ public class ChessGame {
         this.board = ogBoard.copy();
         ChessPiece piece = this.board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
-        boolean attemptCastling = piece.getPieceType() == ChessPiece.PieceType.KING;
-        boolean attemptEnPassant = piece.getPieceType() == ChessPiece.PieceType.PAWN;
 
         Iterator<ChessMove> moveIterator = moves.iterator();
         while (moveIterator.hasNext()) {
@@ -143,13 +215,15 @@ public class ChessGame {
             this.board = prevBoard;
         }
 
+        if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) castling(piece, startPosition, moves);
+        //if (piece.getPieceType() == ChessPiece.PieceType.PAWN) = enPassant(this.board, piece, moves);
+
         this.board = ogBoard;
         return moves;
     }
 
-    private static boolean isMoveinSet(Collection<ChessMove> moves, ChessMove move) {
-        Iterator<ChessMove> moveIterator = moves.iterator();
-        while (moveIterator.hasNext()) if (move.equals(moveIterator.next())) return true;
+    private static boolean isMoveInSet(Collection<ChessMove> moves, ChessMove move) {
+		for (ChessMove chessMove : moves) if (move.equals(chessMove)) return true;
         return false;
     }
 
@@ -160,11 +234,28 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = this.board.getPiece(move.getStartPosition());
+
         // TODO see if move is in validMoves
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if (!isMoveinSet(moves, move)) throw new InvalidMoveException("Invalid move attempted");
+        if (!isMoveInSet(moves, move)) throw new InvalidMoveException("Invalid move attempted");
+
+        if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) {
+            ChessPosition pos = move.getEndPosition();
+            int row = pos.getRow();
+            ChessPosition queenSidePos = new ChessPosition(row, 3);
+            ChessPosition kingSidePos = new ChessPosition(row, 7);
+            if (pos.equals(queenSidePos)) {
+                // Move ROOK to the right of KING
+                movePiece(this.board, new ChessMove(new ChessPosition(row, 1), new ChessPosition(row, 4), null));
+            } else if (pos.equals(kingSidePos)) {
+                // Move ROOK to the left of KING
+                movePiece(this.board, new ChessMove(new ChessPosition(row, 8), new ChessPosition(row, 6), null));
+            }
+        }
+
         movePiece(this.board, move);
-        this.board.getPiece(move.getEndPosition()).pieceMoved();
+        piece.pieceMoved();
     }
 
     /**
