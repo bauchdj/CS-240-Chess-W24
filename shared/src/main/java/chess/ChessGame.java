@@ -190,6 +190,7 @@ public class ChessGame {
     }
 
     private void enPassantValidMoves(ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
+        if (this.lastMove == null) return;
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
         ChessPosition lastPos = this.lastMove.getEndPosition();
@@ -269,6 +270,7 @@ public class ChessGame {
     }
 
     private static void enPassantMove(ChessBoard board, ChessMove lastMove, ChessMove move, ChessPiece piece) {
+        if (lastMove == null) return;
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
         ChessPosition lastPos = lastMove.getEndPosition();
