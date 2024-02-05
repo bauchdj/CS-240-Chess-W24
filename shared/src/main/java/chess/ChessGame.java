@@ -41,13 +41,6 @@ public class ChessGame {
         BLACK
     }
 
-    /*private static void doForMoves(Collection<ChessMove> moves, Predicate<Iterator<ChessMove>> predicate) {
-        Iterator<ChessMove> moveIterator = moves.iterator();
-        while (moveIterator.hasNext()) {
-            predicate.test(moveIterator);
-        }
-    }*/
-
     private static void movePiece(ChessBoard board, ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
@@ -210,10 +203,9 @@ public class ChessGame {
         try { movePiece(this.board, move); }
         catch (InvalidMoveException e) { throw new RuntimeException(e); }
 
-        boolean check = false;
-        if (isInCheck(piece.getTeamColor())) check = true;
+        boolean check = isInCheck(piece.getTeamColor());
 
-        this.board = prevBoard;
+		this.board = prevBoard;
         if (check) return;
 
         moves.add(move);
