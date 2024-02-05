@@ -264,13 +264,13 @@ public class ChessGame {
         ChessPiece lastPiece = board.getPiece(lastPos);
         if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
-        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 4 : 5;
+        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 5 : 4;
         if (lastPos.getRow() != opposingPawnRow) return;
 
         ChessPosition yourPos = move.getStartPosition();
         if (yourPos.getRow() != opposingPawnRow) return;
 
-        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
+        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : -1;
         ChessPosition endPos = move.getEndPosition();
         // TODO If you move 1 forward and to the same column as opponent PAWN
         if (!(endPos.getRow() == (opposingPawnRow + forward) && endPos.getColumn() == lastPos.getColumn())) return;
