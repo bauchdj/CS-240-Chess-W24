@@ -83,19 +83,13 @@ public class ChessGame {
         Iterator<ChessMove> moveIterator = moves.iterator();
         while (moveIterator.hasNext()) {
             ChessMove move = moveIterator.next();
-            try {
-                movePiece(this.board, move);
-            } catch (InvalidMoveException e) {
-                throw new RuntimeException(e);
-            }
+            try { movePiece(this.board, move); }
+            catch (InvalidMoveException e) { throw new RuntimeException(e); }
 
             if (isInCheck(piece.getTeamColor())) moveIterator.remove();
 
-            try {
-                moveBack(this.board, move);
-            } catch (InvalidMoveException e) {
-                throw new RuntimeException(e);
-            }
+            try { moveBack(this.board, move); }
+            catch (InvalidMoveException e) { throw new RuntimeException(e); }
         }
             // Intellij asked me to include return
 			//return false;}
@@ -114,12 +108,12 @@ public class ChessGame {
                 if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) return pos;
             }
         }
-        System.out.println("ERROR!!! Line 85 ChessGame : Should always find King, this should NEVER print.");
         return null;
     }
 
     private static boolean isKingOfTeamInCheck(ChessBoard board, TeamColor teamColor) {
         ChessPosition kingPos = findKing(board, teamColor);
+        if (kingPos == null) return false;
 
         for (int row = 1; row < 9; ++row) {
             for (int column = 1; column < 9; ++ column) {
@@ -127,7 +121,6 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(pos);
                 if (piece == null) continue;
 
-                // TODO Only opposing team pieces
                 if (piece.getTeamColor() == teamColor) continue;
 
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
