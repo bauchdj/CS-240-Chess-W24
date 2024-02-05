@@ -126,6 +126,8 @@ public class ChessGame {
         this.board = ogBoard.copy();
         ChessPiece piece = this.board.getPiece(startPosition);
         Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
+        boolean attemptCastling = piece.getPieceType() == ChessPiece.PieceType.KING;
+        boolean attemptEnPassant = piece.getPieceType() == ChessPiece.PieceType.PAWN;
 
         Iterator<ChessMove> moveIterator = moves.iterator();
         while (moveIterator.hasNext()) {
