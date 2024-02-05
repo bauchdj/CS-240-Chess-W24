@@ -197,14 +197,14 @@ public class ChessGame {
         ChessPiece lastPiece = this.board.getPiece(lastPos);
         if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
-        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 4 : 5;
+        int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 5 : 4;
         if (lastPos.getRow() != opposingPawnRow) return;
         if (startPos.getRow() != opposingPawnRow) return;
 
         ChessBoard prevBoard = this.board;
         this.board = prevBoard.copy();
 
-        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
+        int forward = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : -1;
         ChessMove move = new ChessMove(startPos, new ChessPosition(opposingPawnRow + forward, lastPos.getColumn()), null);
 
         try { movePiece(this.board, move); }
@@ -217,21 +217,6 @@ public class ChessGame {
         if (check) return;
 
         moves.add(move);
-/*
-        for (ChessMove m : moves) {
-            boolean sameRowOpponentPawn = m.getStartPosition().getRow() == opposingPawnRow;
-            boolean behindOpponentPawn = m.getEndPosition().getColumn() == lastPos.getColumn() && m.getEndPosition().getRow() == (opposingPawnRow + forward);
-            if (sameRowOpponentPawn && behindOpponentPawn) {
-                move = m;
-                break;
-            }
-        }
-
-        if (move == null) return;
-
-        ChessPosition endPos = new ChessPosition();
-        moves.add(new ChessMove(move.getStartPosition(), endPos, null));
- */
     }
 
     /**
@@ -266,6 +251,8 @@ public class ChessGame {
         enPassantValidMoves(startPosition, piece, moves);
 
         this.board = ogBoard;
+
+        System.out.println(moves);
         return moves;
     }
 
