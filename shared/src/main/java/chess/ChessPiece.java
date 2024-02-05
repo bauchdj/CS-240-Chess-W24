@@ -243,7 +243,7 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return beenMoved == that.beenMoved && color == that.color && type == that.type;
+        return color == that.color && type == that.type;
     }
 
     @Override

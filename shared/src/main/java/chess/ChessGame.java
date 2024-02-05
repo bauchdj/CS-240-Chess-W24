@@ -290,6 +290,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.board.getPiece(move.getStartPosition());
+        if (this.currentTeam != piece.getTeamColor()) throw new InvalidMoveException("Invalid move attempted");
 
         // TODO see if move is in validMoves
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
@@ -314,6 +315,7 @@ public class ChessGame {
         enPassantMove(this.board, this.lastMove, move, piece);
 
         this.lastMove = move;
+        this.currentTeam = (this.currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         movePiece(this.board, move);
         piece.pieceMoved();
     }
