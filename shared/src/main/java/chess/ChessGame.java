@@ -66,7 +66,7 @@ public class ChessGame {
         return null;
     }
 
-    private static boolean isKingOfTeamInCheck(ChessBoard board, TeamColor teamColor) {
+    private static boolean staticIsInCheck(ChessBoard board, TeamColor teamColor) {
         ChessPosition kingPos = findKing(board, teamColor);
         if (kingPos == null) return false;
 
@@ -79,14 +79,15 @@ public class ChessGame {
 
                 Collection<ChessMove> moves = piece.pieceMoves(board, pos);
 
-				for (ChessMove move : moves) {
-					if (kingPos.equals(move.getEndPosition())) return true;
-				}
+                for (ChessMove move : moves) {
+                    if (kingPos.equals(move.getEndPosition())) return true;
+                }
             }
         }
 
         return false;
     }
+
     /**
      * Determines if the given team is in check
      *
@@ -94,28 +95,20 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //TeamColor opponentColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-
-        // TODO Could be wrong? IDK
-        // TODO you are not in check IF you can take their KING
-        //if (isKingOfTeamInCheck(this.board, opponentColor)) return false;
-
-        // TODO you are in check IF they can take your KING
-        if (isKingOfTeamInCheck(this.board, teamColor)) return true;
-
-        return false;
+        return staticIsInCheck(this.board, teamColor);
     }
 
-    private void castling(ChessPiece piece, ChessPosition startPos, Collection<ChessMove> moves) {
-        // TODO Castling
+    private static void castling(ChessBoard board, ChessPiece piece, ChessPosition startPos, Collection<ChessMove> moves) {
+        if (piece.getBeenMoved() || piece.getPieceType() != ChessPiece.PieceType.KING) return;
+
         int row = startPos.getRow();
-        ChessPiece queenSideRook = this.board.getPiece(new ChessPosition(row, 1));
-        ChessPiece kingSideRook = this.board.getPiece(new ChessPosition(row, 8));
+        ChessPiece queenSideRook = board.getPiece(new ChessPosition(row, 1));
+        ChessPiece kingSideRook = board.getPiece(new ChessPosition(row, 8));
 
         if (queenSideRook != null && !queenSideRook.getBeenMoved()) {
             boolean isPieceInBetween = false;
             for (int col = 2; col < 5; ++col) {
-                if (this.board.getPiece(new ChessPosition(row, col)) != null) {
+                if (board.getPiece(new ChessPosition(row, col)) != null) {
                     isPieceInBetween = true;
                     break;
                 }
@@ -124,19 +117,16 @@ public class ChessGame {
             boolean isKingInCheckInBetween = false;
             if (!isPieceInBetween) {
                 for (int col = 2; col < 5; ++col) {
-                    ChessBoard prevBoard = this.board;
-                    this.board = prevBoard.copy();
+                    ChessBoard boardCopy = board.copy();
 
                     ChessMove move = new ChessMove(startPos, new ChessPosition(row, col), null);
-                    try { movePiece(this.board, move); }
+                    try { movePiece(boardCopy, move); }
                     catch (InvalidMoveException e) { throw new RuntimeException(e); }
 
-                    if (isInCheck(piece.getTeamColor())) {
+                    if (staticIsInCheck(boardCopy, piece.getTeamColor())) {
                         isKingInCheckInBetween = true;
                         break;
                     }
-
-                    this.board = prevBoard;
                 }
 
                 if (!isKingInCheckInBetween) {
@@ -157,22 +147,16 @@ public class ChessGame {
             boolean isKingInCheckInBetween = false;
             if (!isPieceInBetween) {
                 for (int col = 6; col < 8; ++col) {
-                    ChessBoard prevBoard = this.board;
-                    this.board = prevBoard.copy();
+                    ChessBoard boardCopy = board.copy();
 
                     ChessMove move = new ChessMove(startPos, new ChessPosition(row, col), null);
-                    try {
-                        movePiece(this.board, move);
-                    } catch (InvalidMoveException e) {
-                        throw new RuntimeException(e);
-                    }
+                    try { movePiece(boardCopy, move); }
+                    catch (InvalidMoveException e) { throw new RuntimeException(e); }
 
-                    if (isInCheck(piece.getTeamColor())) {
+                    if (staticIsInCheck(boardCopy, piece.getTeamColor())) {
                         isKingInCheckInBetween = true;
                         break;
                     }
-
-                    this.board = prevBoard;
                 }
 
                 if (!isKingInCheckInBetween) {
@@ -182,33 +166,48 @@ public class ChessGame {
         }
     }
 
-    private void enPassantValidMoves(ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
-        if (this.lastMove == null) return;
+    private static void enPassantValidMoves(ChessBoard board, ChessMove lastMove, ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
+        if (lastMove == null) return;
         if (piece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
-        ChessPosition lastPos = this.lastMove.getEndPosition();
-        ChessPiece lastPiece = this.board.getPiece(lastPos);
+        ChessPosition lastPos = lastMove.getEndPosition();
+        ChessPiece lastPiece = board.getPiece(lastPos);
         if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN) return;
 
         int opposingPawnRow = (piece.getTeamColor() == TeamColor.WHITE) ? 5 : 4;
         if (lastPos.getRow() != opposingPawnRow) return;
         if (startPos.getRow() != opposingPawnRow) return;
 
-        ChessBoard prevBoard = this.board;
-        this.board = prevBoard.copy();
-
         int forward = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : -1;
         ChessMove move = new ChessMove(startPos, new ChessPosition(opposingPawnRow + forward, lastPos.getColumn()), null);
 
-        try { movePiece(this.board, move); }
+        try { movePiece(board, move); }
         catch (InvalidMoveException e) { throw new RuntimeException(e); }
 
-        boolean check = isInCheck(piece.getTeamColor());
-
-		this.board = prevBoard;
-        if (check) return;
+        if (staticIsInCheck(board, piece.getTeamColor())) return;
 
         moves.add(move);
+    }
+
+    private static Collection<ChessMove> staticValidMoves(ChessGame game, ChessBoard board, ChessPosition startPosition) {
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        Iterator<ChessMove> moveIterator = moves.iterator();
+        while (moveIterator.hasNext()) {
+            ChessBoard boardCopy = board.copy();
+
+            ChessMove move = moveIterator.next();
+            try { movePiece(boardCopy, move); }
+            catch (InvalidMoveException e) { throw new RuntimeException(e); }
+
+            if (staticIsInCheck(boardCopy, piece.getTeamColor())) moveIterator.remove();
+        }
+
+        castling(board, piece, startPosition, moves);
+        enPassantValidMoves(board.copy(), game.lastMove, startPosition, piece, moves);
+
+        return moves;
     }
 
     /**
@@ -219,32 +218,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessBoard ogBoard = this.board;
-        this.board = ogBoard.copy();
-        ChessPiece piece = this.board.getPiece(startPosition);
-        Collection<ChessMove> moves = piece.pieceMoves(this.board, startPosition);
-
-        Iterator<ChessMove> moveIterator = moves.iterator();
-        while (moveIterator.hasNext()) {
-            ChessBoard prevBoard = this.board;
-            this.board = prevBoard.copy();
-
-            ChessMove move = moveIterator.next();
-            try { movePiece(this.board, move); }
-            catch (InvalidMoveException e) { throw new RuntimeException(e); }
-
-            if (isInCheck(piece.getTeamColor())) moveIterator.remove();
-
-            this.board = prevBoard;
-        }
-
-        // TODO Castling - add those moves
-        if (!piece.getBeenMoved() && piece.getPieceType() == ChessPiece.PieceType.KING) castling(piece, startPosition, moves);
-        enPassantValidMoves(startPosition, piece, moves);
-
-        this.board = ogBoard;
-
-        return moves;
+        return staticValidMoves(this, this.board.copy(), startPosition);
     }
 
     private static void enPassantMove(ChessBoard board, ChessMove lastMove, ChessMove move, ChessPiece piece) {
@@ -274,18 +248,12 @@ public class ChessGame {
         return false;
     }
 
-    /**
-     * Makes a move in a chess game
-     *
-     * @param move chess move to preform
-     * @throws InvalidMoveException if move is invalid
-     */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = this.board.getPiece(move.getStartPosition());
-        if (this.currentTeam != piece.getTeamColor()) throw new InvalidMoveException("Invalid move attempted");
+    private static void staticMakeMove(ChessGame game, ChessBoard board, ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (game.currentTeam != piece.getTeamColor()) throw new InvalidMoveException("Invalid move attempted");
 
         // TODO see if move is in validMoves
-        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        Collection<ChessMove> moves = staticValidMoves(game, board, move.getStartPosition());
         if (!isMoveInSet(moves, move)) throw new InvalidMoveException("Invalid move attempted");
 
         // TODO Castling - Move ROOK according to move
@@ -296,20 +264,30 @@ public class ChessGame {
             ChessPosition kingSidePos = new ChessPosition(row, 7);
             if (pos.equals(queenSidePos)) {
                 // Move ROOK to the right of KING
-                movePiece(this.board, new ChessMove(new ChessPosition(row, 1), new ChessPosition(row, 4), null));
+                movePiece(board, new ChessMove(new ChessPosition(row, 1), new ChessPosition(row, 4), null));
             } else if (pos.equals(kingSidePos)) {
                 // Move ROOK to the left of KING
-                movePiece(this.board, new ChessMove(new ChessPosition(row, 8), new ChessPosition(row, 6), null));
+                movePiece(board, new ChessMove(new ChessPosition(row, 8), new ChessPosition(row, 6), null));
             }
         }
 
         // TODO En Passant - If last move was opposing team's PAWN 2 forward && your PAWN next to them col:(-1, +1) && you move row(+1) THEN remove PAWN of opponent
-        enPassantMove(this.board, this.lastMove, move, piece);
+        enPassantMove(board, game.lastMove, move, piece);
 
-        this.lastMove = move;
-        this.currentTeam = (this.currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        movePiece(this.board, move);
+        game.lastMove = move;
+        game.currentTeam = (game.currentTeam == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        movePiece(board, move);
         piece.pieceMoved();
+    }
+
+    /**
+     * Makes a move in a chess game
+     *
+     * @param move chess move to preform
+     * @throws InvalidMoveException if move is invalid
+     */
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        staticMakeMove(this, this.board, move);
     }
 
     /**
