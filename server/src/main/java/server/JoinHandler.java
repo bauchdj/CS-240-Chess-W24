@@ -1,10 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import service.GameID;
-import service.GameService;
 import spark.Spark;
+
+import service.GameService;
+
+import model.AuthData;
 
 public class JoinHandler {
 	public static void joinGame(GameService gameService) {
