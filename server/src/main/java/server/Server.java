@@ -33,7 +33,7 @@ public class Server {
         GameService gameService = new GameService(gameDAO, authDAO);
 
         CreateHandler.createGame(gameService);
-        // JoinHandler.joinGame(gameService);
+        JoinHandler.joinGame(gameService);
         // ListHandler.listGames(gameService);
 
         Spark.awaitInitialization();

@@ -19,7 +19,7 @@ public class AuthDAO {
 	 * @param authData The authentication data to add.
 	 */
 	public void createAuth(AuthData authData) {
-		database.createAuth(authData);
+		this.database.createAuth(authData);
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class AuthDAO {
 	 * @return An AuthData if found, or null.
 	 */
 	public AuthData getAuth(AuthData authData) {
-		return database.getAuth(authData.getAuthToken());
+		return this.database.getAuth(authData.getAuthToken());
 	}
 
 	/**
@@ -48,6 +48,6 @@ public class AuthDAO {
 	 * @param authData The authentication token to delete.
 	 */
 	public void deleteAuth(AuthData authData) {
-		database.deleteAuth(authData.getAuthToken());
+		this.database.deleteAuth(authData.getAuthToken());
 	}
 }

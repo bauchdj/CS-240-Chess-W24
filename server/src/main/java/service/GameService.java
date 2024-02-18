@@ -33,12 +33,13 @@ public class GameService {
 		return games;
 	}
 
-	public boolean joinGame(AuthData reqAuthData, String clientColor, int gameID) {
-		if (!this.authDAO.authExists(reqAuthData)) return false;
+	public String joinGame(AuthData reqAuthData, String clientColor, int gameID) {
+		if (!this.authDAO.authExists(reqAuthData)) return "unauthorized";
 		AuthData dbAuthData = this.authDAO.getAuth(reqAuthData);
 		String username = dbAuthData.getUsername();
-		System.out.println(clientColor);
+		if (!this.gameDAO.gameExist(gameID)) return "game does not exist";
+		if (this.gameDAO.userExists(username, gameID, clientColor)) return "already taken";
 		this.gameDAO.updateGame(username, gameID, clientColor);
-		return true;
+		return "success";
 	}
 }

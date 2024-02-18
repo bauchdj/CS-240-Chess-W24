@@ -20,13 +20,21 @@ public class CreateHandler {
 				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
 			}
 
-			String gameName = new Gson().fromJson(request.body(), GameName.class).getGameName();
-			GameID gameID = gameService.createGame(new AuthData(authToken), gameName);
+			GameName gameName = new Gson().fromJson(request.body(), GameName.class);
+			if (gameName == null || gameName.getGameName() == null || gameName.getGameName().trim().isEmpty()) {
+				response.status(400);
+				response.type("application/json");
+				return new Gson().toJson(new ErrorResponse("Error: bad request"));
+			}
+
+			GameID gameID = gameService.createGame(new AuthData(authToken), gameName.getGameName());
 			if (gameID == null) {
 				response.status(401);
 				response.type("application/json");
 				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
 			}
+
+			// [500] { "message": "Error: description" }
 
 			response.status(200);
 			response.type("application/json");

@@ -51,10 +51,15 @@ public class Database {
 		return new ArrayList<>(games);
 	}
 
-	public void updateGame(String username, int gameId, String clientColor) {
-		GameData game = getGame(gameId);
+	public boolean userInGame(String username, int gameID, String clientColor) {
+		GameData game = getGame(gameID);
+		if (game != null && game.getWhiteUsername().equals(username)) return true;
+		return game != null && game.getBlackUsername().equals(username);
+	}
+
+	public void updateGame(String username, int gameID, String clientColor) {
+		GameData game = getGame(gameID);
 		if (game != null) {
-			// TODO adjust comparison for clientColor
 			if ("white".equalsIgnoreCase(clientColor)) {
 				game.setWhiteUsername(username);
 			} else if ("black".equalsIgnoreCase(clientColor)) {

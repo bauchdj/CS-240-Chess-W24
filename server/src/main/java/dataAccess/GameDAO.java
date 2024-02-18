@@ -21,17 +21,21 @@ public class GameDAO {
 	 * @param game The game to add.
 	 */
 	public void createGame(GameData game) {
-		database.createGame(game);
+		this.database.createGame(game);
 	}
 
 	/**
 	 * Retrieves a game by its ID.
 	 *
-	 * @param gameId The ID of the game to retrieve.
+	 * @param gameID The ID of the game to retrieve.
 	 * @return An GameData if found, or null.
 	 */
-	public GameData getGame(int gameId) {
-		return database.getGame(gameId);
+	public GameData getGame(int gameID) {
+		return this.database.getGame(gameID);
+	}
+
+	public boolean gameExist(int gameID) {
+		return getGame(gameID) != null;
 	}
 
 	/**
@@ -43,6 +47,10 @@ public class GameDAO {
 		return database.listGames();
 	}
 
+	public boolean userExists(String username, int gameId, String clientColor) {
+		return this.database.userInGame(username, gameId, clientColor);
+	}
+
 	/**
 	 * Updates the game participants for a given game ID.
 	 *
@@ -51,6 +59,6 @@ public class GameDAO {
 	 * @param clientColor The color chosen by the participant (e.g., "white" or "black").
 	 */
 	public void updateGame(String username, int gameId, String clientColor) {
-		database.updateGame(username, gameId, clientColor);
+		this.database.updateGame(username, gameId, clientColor);
 	}
 }

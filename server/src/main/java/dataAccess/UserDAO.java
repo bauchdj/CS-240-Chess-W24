@@ -10,7 +10,7 @@ public class UserDAO {
 	}
 
 	public void clearUsers() {
-		database.clearUsers();
+		this.database.clearUsers();
 	}
 
 	/**
@@ -19,7 +19,7 @@ public class UserDAO {
 	 * @param user The user to add.
 	 */
 	public void createUser(UserData user) {
-		database.createUser(user);
+		this.database.createUser(user);
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class UserDAO {
 	 * @return An UserData if found, or null.
 	 */
 	public UserData getUser(String username) {
-		return database.getUser(username);
+		return this.database.getUser(username);
 	}
 
 	/**

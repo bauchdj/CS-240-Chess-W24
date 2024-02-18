@@ -13,7 +13,7 @@ public class RegisterHandler {
 		Spark.post("/user", (request, response) -> {
 			UserData user = new Gson().fromJson(request.body(), UserData.class);
 
-			if (user.getUsername() == null || user.getUsername().trim().isEmpty() ||
+			if (user == null || user.getUsername() == null || user.getUsername().trim().isEmpty() ||
 					user.getPassword() == null || user.getPassword().trim().isEmpty()) {
 				response.status(400);
 				response.type("application/json");
