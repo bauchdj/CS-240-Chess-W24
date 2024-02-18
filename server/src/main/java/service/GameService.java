@@ -20,7 +20,7 @@ public class GameService {
 
 	public GameID createGame(AuthData authData, String gameName) {
 		if (!this.authDAO.authExists(authData)) return null;
-		int id = Integer.parseInt(UUID.randomUUID().toString());
+		int id = UUID.randomUUID().toString().hashCode() & 0x7FFFFFFF;
 		ChessGame game = new ChessGame();
 		GameData gameData = new GameData(id, gameName, game);
 		this.gameDAO.createGame(gameData);
