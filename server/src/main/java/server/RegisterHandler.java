@@ -9,8 +9,6 @@ import model.UserData;
 import model.AuthData;
 
 public class RegisterHandler {
-	private RegisterHandler() {};
-
 	public static void register(UserService userService) {
 		Spark.post("/user", (request, response) -> {
 			UserData user = new Gson().fromJson(request.body(), UserData.class);

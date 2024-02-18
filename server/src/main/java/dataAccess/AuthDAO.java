@@ -2,8 +2,6 @@ package dataAccess;
 
 import model.AuthData;
 
-import java.util.Optional;
-
 public class AuthDAO {
 	private final Database database;
 
@@ -28,7 +26,7 @@ public class AuthDAO {
 	 * Retrieves authentication data by auth token.
 	 *
 	 * @param authData The authentication token.
-	 * @return An Optional containing the AuthData if found, or an empty Optional if not found.
+	 * @return An AuthData if found, or null.
 	 */
 	public AuthData getAuth(AuthData authData) {
 		return database.getAuth(authData.getAuthToken());

@@ -9,8 +9,6 @@ import model.UserData;
 import model.AuthData;
 
 public class LoginHandler {
-	private LoginHandler() {};
-
 	public static void login(UserService userService) {
 		Spark.post("/session", (request, response) -> {
 			UserData user = new Gson().fromJson(request.body(), UserData.class);

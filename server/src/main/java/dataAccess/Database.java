@@ -54,6 +54,7 @@ public class Database {
 	public void updateGame(String username, int gameId, String clientColor) {
 		GameData game = getGame(gameId);
 		if (game != null) {
+			// TODO adjust comparison for clientColor
 			if ("white".equalsIgnoreCase(clientColor)) {
 				game.setWhiteUsername(username);
 			} else if ("black".equalsIgnoreCase(clientColor)) {

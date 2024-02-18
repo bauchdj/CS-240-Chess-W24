@@ -8,6 +8,7 @@ import dataAccess.GameDAO;
 import dataAccess.AuthDAO;
 
 import service.UserService;
+import service.GameService;
 
 public class Server {
     public int run(int desiredPort) {
@@ -23,11 +24,17 @@ public class Server {
 
         UserService userService = new UserService(userDAO, authDAO);
 
-        clearHandler.clear(userDAO, gameDAO, authDAO);
+        ClearHandler.clear(userDAO, gameDAO, authDAO);
 
         RegisterHandler.register(userService);
         LoginHandler.login(userService);
         LogoutHandler.logout(userService);
+
+        GameService gameService = new GameService(gameDAO, authDAO);
+
+        CreateHandler.createGame(gameService);
+        // JoinHandler.joinGame(gameService);
+        // ListHandler.listGames(gameService);
 
         Spark.awaitInitialization();
         return Spark.port();

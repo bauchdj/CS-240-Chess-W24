@@ -5,8 +5,8 @@ import dataAccess.GameDAO;
 import dataAccess.UserDAO;
 import spark.Spark;
 
-public class clearHandler {
-	private clearHandler() {}
+public class ClearHandler {
+	private ClearHandler() {}
 
 	public static void clear(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
 		Spark.delete("/db", (request, response) -> {

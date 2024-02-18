@@ -3,7 +3,6 @@ package dataAccess;
 import model.GameData;
 
 import java.util.List;
-import java.util.Optional;
 
 public class GameDAO {
 	private final Database database;
@@ -29,9 +28,9 @@ public class GameDAO {
 	 * Retrieves a game by its ID.
 	 *
 	 * @param gameId The ID of the game to retrieve.
-	 * @return An Optional containing the Game if found, or an empty Optional if not found.
+	 * @return An GameData if found, or null.
 	 */
-	public GameData getGameById(int gameId) {
+	public GameData getGame(int gameId) {
 		return database.getGame(gameId);
 	}
 
@@ -40,7 +39,7 @@ public class GameDAO {
 	 *
 	 * @return A List of all games.
 	 */
-	public List<GameData> getAllGames() {
+	public List<GameData> listGames() {
 		return database.listGames();
 	}
 

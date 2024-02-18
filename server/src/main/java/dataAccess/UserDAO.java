@@ -2,9 +2,6 @@ package dataAccess;
 
 import model.UserData;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 public class UserDAO {
 	private final Database database;
 
@@ -29,7 +26,7 @@ public class UserDAO {
 	 * Retrieves a user by username.
 	 *
 	 * @param username The username of the user to retrieve.
-	 * @return An Optional containing the User if found, or an empty Optional if not found.
+	 * @return An UserData if found, or null.
 	 */
 	public UserData getUser(String username) {
 		return database.getUser(username);
