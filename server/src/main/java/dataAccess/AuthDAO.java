@@ -11,6 +11,10 @@ public class AuthDAO {
 		this.database = database;
 	}
 
+	public void clearAuth() {
+		this.database.clearAuth();
+	}
+
 	/**
 	 * Adds a new authentication data entry to the database.
 	 *

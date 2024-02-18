@@ -12,6 +12,10 @@ public class GameDAO {
 		this.database = database;
 	}
 
+	public void clearGames() {
+		this.database.clearGames();
+	}
+
 	/**
 	 * Adds a new game to the database.
 	 *

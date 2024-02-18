@@ -23,7 +23,8 @@ public class Server {
 
         UserService userService = new UserService(userDAO, authDAO);
 
-        // Register your endpoints and handle exceptions here.
+        clearHandler.clear(userDAO, gameDAO, authDAO);
+
         RegisterHandler.register(userService);
         LoginHandler.login(userService);
         LogoutHandler.logout(userService);
