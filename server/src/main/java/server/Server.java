@@ -34,7 +34,6 @@ public class Server {
             AuthData authData = userService.register(user);
             response.status(200);
             return authData.getAuthToken();
-            //return new Gson().toJson(new StandardResponse(StatusResponse.SUCCESS, authToken));
         });
 
         Spark.awaitInitialization();
