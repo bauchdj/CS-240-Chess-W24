@@ -54,7 +54,9 @@ public class UserService {
 		return null;
 	}
 
-	public void logout(AuthData authData) {
+	public boolean logout(AuthData authData) {
+		if (this.authDAO.authExists(authData)) return false;
 		this.authDAO.deleteAuth(authData);
+		return true;
 	}
 }

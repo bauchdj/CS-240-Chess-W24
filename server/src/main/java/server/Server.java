@@ -53,6 +53,43 @@ public class Server {
             return new Gson().toJson(authData);
         });
 
+        Spark.post("/session", (request, response) -> {
+            UserData user = new Gson().fromJson(request.body(), UserData.class);
+            AuthData authData = userService.login(user);
+
+            if (authData == null) {
+                response.status(401);
+                response.type("application/json");
+                return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            // [500] { "message": "Error: description" }
+
+            response.status(200);
+            return new Gson().toJson(authData);
+        });
+
+        Spark.delete("/session", (request, response) -> {
+            String authToken = request.headers("authorization");
+
+            if (authToken == null || authToken.isEmpty()) {
+                response.status(401); // Unauthorized
+                response.type("application/json");
+                return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            boolean success = userService.logout(new AuthData(authToken));
+            if (!success) {
+                response.status(401); // Unauthorized
+                response.type("application/json");
+                return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            response.status(200);
+            response.type("application/json");
+            return "{}";
+        });
+
         Spark.awaitInitialization();
         return Spark.port();
     }

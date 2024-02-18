@@ -23,11 +23,21 @@ public class AuthDAO {
 	/**
 	 * Retrieves authentication data by auth token.
 	 *
-	 * @param authToken The authentication token.
+	 * @param authData The authentication token.
 	 * @return An Optional containing the AuthData if found, or an empty Optional if not found.
 	 */
-	public AuthData getAuth(String authToken) {
-		return database.getAuth(authToken);
+	public AuthData getAuth(AuthData authData) {
+		return database.getAuth(authData.getAuthToken());
+	}
+
+	/**
+	 * Checks if a authToken exists by authData.
+	 *
+	 * @param authData The username to check.
+	 * @return true if the authToken exists, false otherwise.
+	 */
+	public boolean authExists(AuthData authData) {
+		return getAuth(authData) != null;
 	}
 
 	/**
