@@ -11,7 +11,6 @@ public class GameData {
 	private String gameName;
 	private ChessGame game; // Assuming ChessGame is an interface or class you have defined
 
-	// Constructor
 	public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
 		setGameID(gameID);
 		setWhiteUsername(whiteUsername);
@@ -20,11 +19,6 @@ public class GameData {
 		setGame(game);
 	}
 
-	// Default constructor
-	public GameData() {
-	}
-
-	// Getter and Setter methods
 	public int getGameID() {
 		return gameID;
 	}

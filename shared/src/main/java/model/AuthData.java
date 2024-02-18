@@ -3,11 +3,10 @@ package model;
 import java.util.Objects;
 
 public class AuthData {
-	private String authToken;
 	private String username;
+	private String authToken;
 
-	// Constructor
-	public AuthData(String authToken, String username) {
+	public AuthData(String username, String authToken) {
 		setAuthToken(authToken);
 		setUsername(username);
 	}
@@ -17,11 +16,6 @@ public class AuthData {
 		setUsername(null);
 	}
 
-	// Default constructor
-	public AuthData() {
-	}
-
-	// Getter and setter methods
 	public String getAuthToken() {
 		return authToken;
 	}

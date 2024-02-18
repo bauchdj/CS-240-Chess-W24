@@ -7,7 +7,6 @@ public class UserData {
 	private String password;
 	private String email;
 
-	// Constructor
 	public UserData(String username, String password, String email) {
 		setUsername(username);
 		setPassword(password);
@@ -20,11 +19,6 @@ public class UserData {
 		setEmail(null);
 	}
 
-	// Default constructor
-	public UserData() {
-	}
-
-	// Getter and Setter methods
 	public String getUsername() {
 		return username;
 	}

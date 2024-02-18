@@ -31,9 +31,26 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", (request, response) -> {
             UserData user = new Gson().fromJson(request.body(), UserData.class);
+
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty() ||
+                    user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                response.status(400);
+                response.type("application/json");
+                return new Gson().toJson(new ErrorResponse("Error: bad request"));
+            }
+
             AuthData authData = userService.register(user);
+            if (authData == null) {
+                response.status(403);
+                response.type("application/json");
+                return new Gson().toJson(new ErrorResponse("Error: already taken"));
+            }
+
+            //	[500] { "message": "Error: description" }
+
             response.status(200);
-            return authData.getAuthToken();
+            response.type("application/json");
+            return new Gson().toJson(authData);
         });
 
         Spark.awaitInitialization();
