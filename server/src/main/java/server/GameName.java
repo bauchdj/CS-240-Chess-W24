@@ -10,4 +10,11 @@ public class GameName {
 	public String getGameName() {
 		return gameName;
 	}
+
+	@Override
+	public String toString() {
+		return "GameName{" +
+				"gameName='" + gameName + '\'' +
+				'}';
+	}
 }

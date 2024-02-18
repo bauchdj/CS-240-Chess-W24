@@ -12,15 +12,19 @@ import model.GameData;
 public class GameService {
 	private final GameDAO gameDAO;
 	private final AuthDAO authDAO;
+	private int gameID;
 
 	public GameService(GameDAO gameDAO, AuthDAO authDAO) {
 		this.gameDAO = gameDAO;
 		this.authDAO = authDAO;
+		this.gameID = 1;
 	}
 
 	public GameID createGame(AuthData authData, String gameName) {
 		if (!this.authDAO.authExists(authData)) return null;
-		int id = UUID.randomUUID().toString().hashCode() & 0x7FFFFFFF;
+		//int id = UUID.randomUUID().toString().hashCode() & 0x7FFFFFFF;
+		int id = this.gameID;
+		++this.gameID;
 		ChessGame game = new ChessGame();
 		GameData gameData = new GameData(id, gameName, game);
 		this.gameDAO.createGame(gameData);

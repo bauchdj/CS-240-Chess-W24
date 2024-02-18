@@ -38,7 +38,7 @@ public class CreateHandler {
 
 			response.status(200);
 			response.type("application/json");
-			return "{}";
+			return new Gson().toJson(gameID);
 		});
 	}
 }

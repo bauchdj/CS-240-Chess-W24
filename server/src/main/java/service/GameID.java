@@ -10,4 +10,11 @@ public class GameID {
 	public int getGameID() {
 		return gameID;
 	}
+
+	@Override
+	public String toString() {
+		return "GameID{" +
+				"gameID=" + gameID +
+				'}';
+	}
 }

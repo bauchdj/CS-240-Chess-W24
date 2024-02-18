@@ -18,13 +18,15 @@ public class JoinHandler {
 				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
 			}
 
-			// Gson will throw a parsing error if int is empty request.body()
 			UserJoinGame joinData = new Gson().fromJson(request.body(), UserJoinGame.class);
+
+			// TODO Add logic for Watch if (joinData.getPlayerColor() == null)
+
 			if (joinData == null || joinData.getPlayerColor() == null ||
-					joinData.getPlayerColor().trim().isEmpty() ||
-					joinData.getGameID() == 0) {
+					joinData.getPlayerColor().trim().isEmpty()) {
 				response.status(400);
 				response.type("application/json");
+				System.out.println(request.body());
 				return new Gson().toJson(new ErrorResponse("Error: bad request"));
 			}
 
@@ -41,7 +43,7 @@ public class JoinHandler {
 				response.type("application/json");
 				return new Gson().toJson(new ErrorResponse("Error: already taken"));
 			} else if (status.equals("game does not exist")) {
-				response.status(500);
+				response.status(400);
 				response.type("application/json");
 				return new Gson().toJson(new ErrorResponse("Error: " + status));
 			}

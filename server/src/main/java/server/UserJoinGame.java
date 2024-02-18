@@ -16,4 +16,12 @@ public class UserJoinGame {
 	public int getGameID() {
 		return gameID;
 	}
+
+	@Override
+	public String toString() {
+		return "UserJoinGame{" +
+				"playerColor='" + playerColor + '\'' +
+				", gameID=" + gameID +
+				'}';
+	}
 }
