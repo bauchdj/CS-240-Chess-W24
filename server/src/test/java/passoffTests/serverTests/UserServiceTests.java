@@ -11,10 +11,10 @@ import model.UserData;
 import model.AuthData;
 
 public class UserServiceTests {
-	private final Database db = new Database();
-	private final UserDAO userDAO = new UserDAO(db);
-	private final AuthDAO authDAO = new AuthDAO(db);
-	private final UserService userService = new UserService(userDAO, authDAO);
+	private static final Database db = new Database();
+	private static final UserDAO userDAO = new UserDAO(db);
+	private static final AuthDAO authDAO = new AuthDAO(db);
+	private static final UserService userService = new UserService(userDAO, authDAO);
 
 	@Test
 	@Order(1)
@@ -29,8 +29,32 @@ public class UserServiceTests {
 	@Order(2)
 	@DisplayName("Empty Password")
 	public void failRegister() throws TestException {
+		// Empty username
 		Assertions.assertNull(userService.register(new UserData("", "pwd", "user@chess.com")));
+		// Empty password
 		Assertions.assertNull(userService.register(new UserData("user", "", "user@chess.com")));
+		// Empty email
 		Assertions.assertNull(userService.register(new UserData("user", "pwd", "")));
 	}
+
+	@Test
+	@Order(3)
+	@DisplayName("Login Success")
+	public void successLogin() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		Assertions.assertNotNull(authData);
+	}
+
+	@Test
+	@Order(3)
+	@DisplayName("Non-existent User Login")
+	public void loginInvalidUser() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		AuthData authData = userService.login(userData);
+		Assertions.assertNull(authData);
+	}
+
+	
 }
