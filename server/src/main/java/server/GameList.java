@@ -15,4 +15,11 @@ public class GameList {
 	public List<GameData> getGames() {
 		return games;
 	}
+
+	@Override
+	public String toString() {
+		return "GameList{" +
+				"games=" + games +
+				'}';
+	}
 }

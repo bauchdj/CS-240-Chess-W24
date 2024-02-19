@@ -21,8 +21,8 @@ public class GameData {
 
 	public GameData(int gameID, String gameName, ChessGame game) {
 		setGameID(gameID);
-		setWhiteUsername("");
-		setBlackUsername("");
+		setWhiteUsername(null);
+		setBlackUsername(null);
 		setGameName(gameName);
 		setGame(game);
 	}

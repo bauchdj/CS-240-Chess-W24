@@ -27,8 +27,6 @@ public class ListGamesHandler {
 
 			// [500] { "message": "Error: description" }
 
-			System.out.println(games);
-
 			response.status(200);
 			response.type("application/json");
 			return new Gson().toJson(games);

@@ -53,8 +53,8 @@ public class Database {
 
 	public boolean userInGame(String username, int gameID, String clientColor) {
 		GameData game = getGame(gameID);
-		if (game != null && !game.getWhiteUsername().isEmpty()) return true;
-		return game != null && !game.getBlackUsername().isEmpty();
+		if (game != null && game.getWhiteUsername() != null) return true;
+		return game != null && game.getBlackUsername() != null;
 	}
 
 	public void updateGame(String username, int gameID, String clientColor) {
