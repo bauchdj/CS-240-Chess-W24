@@ -34,7 +34,7 @@ public class Server {
 
         CreateHandler.createGame(gameService);
         JoinHandler.joinGame(gameService);
-        // ListHandler.listGames(gameService);
+        ListGamesHandler.listGames(gameService);
 
         Spark.awaitInitialization();
         return Spark.port();

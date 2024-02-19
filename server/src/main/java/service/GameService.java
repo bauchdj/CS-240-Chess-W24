@@ -33,8 +33,7 @@ public class GameService {
 
 	public List<GameData> listGames(AuthData authData) {
 		if (!this.authDAO.authExists(authData)) return null;
-		List<GameData> games = this.gameDAO.listGames();
-		return games;
+		return this.gameDAO.listGames();
 	}
 
 	public String joinGame(AuthData reqAuthData, String clientColor, int gameID) {
