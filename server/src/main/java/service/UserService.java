@@ -26,7 +26,10 @@ public class UserService {
 		String username = user.getUsername();
 		UserData dbUser = this.userDAO.getUser(username);
 
-		if (dbUser == null) {
+		if (dbUser == null
+				&& !user.getUsername().isEmpty()
+				&& !user.getPassword().isEmpty()
+				&& !user.getEmail().isEmpty()) {
 			String password = user.getPassword();
 			UserData newUser = new UserData(username, password, user.getEmail());
 			this.userDAO.createUser(newUser);

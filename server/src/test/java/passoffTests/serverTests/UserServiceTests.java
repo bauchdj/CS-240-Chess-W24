@@ -24,4 +24,13 @@ public class UserServiceTests {
 		userService.register(userData);
 		Assertions.assertEquals(userData, userDAO.getUser("user"));
 	}
+
+	@Test
+	@Order(2)
+	@DisplayName("Empty Password")
+	public void failRegister() throws TestException {
+		Assertions.assertNull(userService.register(new UserData("", "pwd", "user@chess.com")));
+		Assertions.assertNull(userService.register(new UserData("user", "", "user@chess.com")));
+		Assertions.assertNull(userService.register(new UserData("user", "pwd", "")));
+	}
 }
