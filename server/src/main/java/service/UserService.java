@@ -24,21 +24,19 @@ public class UserService {
 
 	public AuthData register(UserData user) {
 		String username = user.getUsername();
-		UserData dbUser = this.userDAO.getUser(username);
+		String password = user.getPassword();
+		String email = user.getEmail();
 
-		if (dbUser == null
-				&& !user.getUsername().isEmpty()
-				&& !user.getPassword().isEmpty()
-				&& !user.getEmail().isEmpty()) {
-			String password = user.getPassword();
-			UserData newUser = new UserData(username, password, user.getEmail());
-			this.userDAO.createUser(newUser);
-			AuthData authData = createAuthData(username);
-			this.authDAO.createAuth(authData);
-			return authData;
-		}
+		if (this.userDAO.userExists(username)
+				|| username.isEmpty()
+				|| password.isEmpty()
+				|| email.isEmpty()) return null;
 
-		return null;
+		UserData newUser = new UserData(username, password, email);
+		this.userDAO.createUser(newUser);
+		AuthData authData = createAuthData(username);
+		this.authDAO.createAuth(authData);
+		return authData;
 	}
 
 	private static boolean verifyPassword(String userPwd, String dbPwd) {
