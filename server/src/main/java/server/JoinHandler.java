@@ -20,10 +20,7 @@ public class JoinHandler {
 
 			UserJoinGame joinData = new Gson().fromJson(request.body(), UserJoinGame.class);
 
-			// TODO Add logic for Watch if (joinData.getPlayerColor() == null)
-
-			if (joinData == null || joinData.getPlayerColor() == null ||
-					joinData.getPlayerColor().trim().isEmpty()) {
+			if (joinData == null) {
 				response.status(400);
 				response.type("application/json");
 				System.out.println(request.body());
