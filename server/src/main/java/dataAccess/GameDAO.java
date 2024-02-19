@@ -2,7 +2,7 @@ package dataAccess;
 
 import model.GameData;
 
-import java.util.List;
+import java.util.HashSet;
 
 public class GameDAO {
 	private final Database database;
@@ -43,7 +43,7 @@ public class GameDAO {
 	 *
 	 * @return A List of all games.
 	 */
-	public List<GameData> listGames() {
+	public HashSet<GameData> listGames() {
 		return database.listGames();
 	}
 

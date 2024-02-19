@@ -1,7 +1,6 @@
 package service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.HashSet;
 
 import chess.ChessGame;
 import dataAccess.AuthDAO;
@@ -31,7 +30,7 @@ public class GameService {
 		return new GameID(id);
 	}
 
-	public List<GameData> listGames(AuthData authData) {
+	public HashSet<GameData> listGames(AuthData authData) {
 		if (!this.authDAO.authExists(authData)) return null;
 		return this.gameDAO.listGames();
 	}

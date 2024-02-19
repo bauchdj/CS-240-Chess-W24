@@ -4,14 +4,14 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Database {
-	private final List<UserData> users = new ArrayList<>();
-	private final List<GameData> games = new ArrayList<>();
+	private final HashSet<UserData> users = new HashSet<>();
+	private final HashSet<GameData> games = new HashSet<>();
 	private final Map<String, AuthData> authTokens = new HashMap<>();
 
 	public void clearUsers() { users.clear(); }
@@ -47,14 +47,15 @@ public class Database {
 				.orElse(null);
 	}
 
-	public List<GameData> listGames() {
-		return new ArrayList<>(games);
+	public HashSet<GameData> listGames() {
+		return new HashSet<>(games);
 	}
 
 	public boolean userInGame(String username, int gameID, String clientColor) {
 		GameData game = getGame(gameID);
-		if (game != null && game.getWhiteUsername() != null) return true;
-		return game != null && game.getBlackUsername() != null;
+		return game != null &&
+				(("white".equalsIgnoreCase(clientColor) && game.getWhiteUsername() != null) ||
+				 "black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
 	}
 
 	public void updateGame(String username, int gameID, String clientColor) {
