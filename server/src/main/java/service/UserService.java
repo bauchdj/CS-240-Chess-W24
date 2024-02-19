@@ -19,14 +19,14 @@ public class UserService {
 
 	private static AuthData createAuthData(String username) {
 		String authToken = UUID.randomUUID().toString();;
-		AuthData authData = new AuthData(username, authToken);
-		return authData;
+		return new AuthData(username, authToken);
 	}
 
 	public AuthData register(UserData user) {
 		String username = user.getUsername();
-		UserData u = this.userDAO.getUser(username);
-		if (u == null) {
+		UserData dbUser = this.userDAO.getUser(username);
+
+		if (dbUser == null) {
 			String password = user.getPassword();
 			UserData newUser = new UserData(username, password, user.getEmail());
 			this.userDAO.createUser(newUser);
@@ -45,6 +45,7 @@ public class UserService {
 	public AuthData login(UserData user) {
 		String username = user.getUsername();
 		UserData dbUser = this.userDAO.getUser(username);
+
 		if (dbUser != null && verifyPassword(user.getPassword(), dbUser.getPassword())) {
 			AuthData authData = createAuthData(username);
 			this.authDAO.createAuth(authData);

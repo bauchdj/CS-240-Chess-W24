@@ -1,6 +1,7 @@
 package service;
 
 import java.util.HashSet;
+//import java.util.UUID;
 
 import chess.ChessGame;
 import dataAccess.AuthDAO;
