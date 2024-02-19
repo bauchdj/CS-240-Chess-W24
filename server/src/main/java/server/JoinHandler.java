@@ -45,6 +45,8 @@ public class JoinHandler {
 				return new Gson().toJson(new ErrorResponse("Error: " + status));
 			}
 
+			// [500] { "message": "Error: description" }
+
 			response.status(200);
 			response.type("application/json");
 			return "{}";
