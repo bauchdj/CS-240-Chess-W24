@@ -15,6 +15,7 @@ public class ServiceTests {
 	private static final GameDAO gameDAO = new GameDAO(db);
 	private static final UserService userService = new UserService(userDAO, authDAO);
 	private static final GameService gameService = new GameService(gameDAO, authDAO);
+	private static final ClearService clearService = new ClearService(authDAO, userDAO, gameDAO);
 
 	@BeforeEach
 	public void setup() throws TestException {
@@ -124,7 +125,7 @@ public class ServiceTests {
 	}
 
 	@Test
-	@Order(7)
+	@Order(9)
 	@DisplayName("Join Game Success")
 	public void successJoinGame() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
@@ -141,7 +142,7 @@ public class ServiceTests {
 	}
 
 	@Test
-	@Order(8)
+	@Order(10)
 	@DisplayName("Join Game Invalid")
 	public void invalidJoinGame() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
@@ -168,7 +169,7 @@ public class ServiceTests {
 	}
 
 	@Test
-	@Order(9)
+	@Order(11)
 	@DisplayName("List Games")
 	public void successListGames() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
@@ -181,7 +182,7 @@ public class ServiceTests {
 	}
 
 	@Test
-	@Order(10)
+	@Order(12)
 	@DisplayName("List Games Invalid")
 	public void invalidListGames() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
@@ -193,4 +194,20 @@ public class ServiceTests {
 		userService.logout(authData);
 		Assertions.assertNull(gameService.listGames(authData));
 	}
+
+	@Test
+	@Order(13)
+	@DisplayName("Clear Success")
+	public void successClear() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		gameService.createGame(authData, "g");
+
+		Assertions.assertTrue(clearService.clear());
+
+		Assertions.assertNull(gameService.listGames(authData));
+	}
+
+	// Don't know how to test clear failing.
 }

@@ -3,14 +3,15 @@ package dataAccess;
 import model.UserData;
 
 public class UserDAO {
-	private final Database database;
+	private final DataAccess database;
 
-	public UserDAO(Database database) {
+	public UserDAO(DataAccess database) {
 		this.database = database;
 	}
 
-	public void clearUsers() {
+	public boolean clearUsers() {
 		this.database.clearUsers();
+		return true;
 	}
 
 	/**

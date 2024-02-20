@@ -6,10 +6,9 @@ import model.UserData;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Database {
+public class Database implements DataAccess {
 	private final HashSet<UserData> users = new HashSet<>();
 	private final HashSet<GameData> games = new HashSet<>();
 	private final Map<String, AuthData> authTokens = new HashMap<>();

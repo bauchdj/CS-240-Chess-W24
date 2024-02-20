@@ -1,20 +1,20 @@
 package handlers;
 
-import dataAccess.AuthDAO;
-import dataAccess.GameDAO;
-import dataAccess.UserDAO;
+import com.google.gson.Gson;
 import spark.Spark;
 
+import service.ClearService;
+
 public class ClearHandler {
-	private ClearHandler() {}
-
-	public static void clear(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+	public static void clear(ClearService clearService) {
 		Spark.delete("/db", (request, response) -> {
-			userDAO.clearUsers();
-			gameDAO.clearGames();
-			authDAO.clearAuth();
+			boolean status = clearService.clear();
 
-			// [500] { "message": "Error: description" }
+			if (!status) {
+				response.status(500);
+				response.type("application/json");
+				return new Gson().toJson(new ErrorResponse("Error: failed to clear database"));
+			}
 
 			response.status(200);
 			response.type("application/json");

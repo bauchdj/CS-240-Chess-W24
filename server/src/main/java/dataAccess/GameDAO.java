@@ -5,14 +5,15 @@ import model.GameData;
 import java.util.HashSet;
 
 public class GameDAO {
-	private final Database database;
+	private final DataAccess database;
 
-	public GameDAO(Database database) {
+	public GameDAO(DataAccess database) {
 		this.database = database;
 	}
 
-	public void clearGames() {
+	public boolean clearGames() {
 		this.database.clearGames();
+		return true;
 	}
 
 	/**

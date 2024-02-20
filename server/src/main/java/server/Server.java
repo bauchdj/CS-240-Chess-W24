@@ -2,14 +2,14 @@ package server;
 
 import spark.*;
 
+import dataAccess.DataAccess;
 import dataAccess.Database;
 import dataAccess.UserDAO;
 import dataAccess.GameDAO;
 import dataAccess.AuthDAO;
 
 import handlers.*;
-import service.UserService;
-import service.GameService;
+import service.*;
 
 public class Server {
     public int run(int desiredPort) {
@@ -17,22 +17,21 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        Database db = new Database();
+        DataAccess db = new Database();
 
         UserDAO userDAO = new UserDAO(db);
         GameDAO gameDAO = new GameDAO(db);
         AuthDAO authDAO = new AuthDAO(db);
 
+        ClearService clearService = new ClearService(authDAO, userDAO, gameDAO);
+        ClearHandler.clear(clearService);
+
         UserService userService = new UserService(userDAO, authDAO);
-
-        ClearHandler.clear(userDAO, gameDAO, authDAO);
-
         RegisterHandler.register(userService);
         LoginHandler.login(userService);
         LogoutHandler.logout(userService);
 
         GameService gameService = new GameService(gameDAO, authDAO);
-
         CreateHandler.createGame(gameService);
         JoinHandler.joinGame(gameService);
         ListGamesHandler.listGames(gameService);

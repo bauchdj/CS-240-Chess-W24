@@ -3,14 +3,15 @@ package dataAccess;
 import model.AuthData;
 
 public class AuthDAO {
-	private final Database database;
+	private final DataAccess database;
 
-	public AuthDAO(Database database) {
+	public AuthDAO(DataAccess database) {
 		this.database = database;
 	}
 
-	public void clearAuth() {
+	public boolean clearAuth() {
 		this.database.clearAuth();
+		return true;
 	}
 
 	/**

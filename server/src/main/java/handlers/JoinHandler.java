@@ -24,7 +24,6 @@ public class JoinHandler {
 			if (joinData == null) {
 				response.status(400);
 				response.type("application/json");
-				System.out.println(request.body());
 				return new Gson().toJson(new ErrorResponse("Error: bad request"));
 			}
 
