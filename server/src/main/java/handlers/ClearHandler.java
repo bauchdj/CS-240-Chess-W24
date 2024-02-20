@@ -1,4 +1,4 @@
-package server.handlers;
+package handlers;
 
 import dataAccess.AuthDAO;
 import dataAccess.GameDAO;

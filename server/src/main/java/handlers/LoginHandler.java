@@ -1,6 +1,5 @@
-package server.handlers;
+package handlers;
 
-import server.ErrorResponse;
 import spark.Spark;
 import com.google.gson.Gson;
 

@@ -1,6 +1,5 @@
 package server;
 
-import server.handlers.*;
 import spark.*;
 
 import dataAccess.Database;
@@ -8,6 +7,7 @@ import dataAccess.UserDAO;
 import dataAccess.GameDAO;
 import dataAccess.AuthDAO;
 
+import handlers.*;
 import service.UserService;
 import service.GameService;
 

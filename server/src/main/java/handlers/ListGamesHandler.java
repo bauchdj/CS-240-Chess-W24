@@ -1,17 +1,15 @@
-package server.handlers;
+package handlers;
 
-import server.ErrorResponse;
-import spark.Spark;
 import com.google.gson.Gson;
+import spark.Spark;
 
-import service.UserService;
+import service.GameService;
 
-import model.UserData;
 import model.AuthData;
 
-public class LogoutHandler {
-	public static void logout(UserService userService) {
-		Spark.delete("/session", (request, response) -> {
+public class ListGamesHandler {
+	public static void listGames(GameService gamerService) {
+		Spark.get("/game", (request, response) -> {
 			String authToken = request.headers("authorization");
 
 			if (authToken == null || authToken.isEmpty()) {
@@ -20,16 +18,19 @@ public class LogoutHandler {
 				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
 			}
 
-			boolean success = userService.logout(new AuthData(authToken));
-			if (!success) {
+			GameList games = new GameList(gamerService.listGames(new AuthData(authToken)));
+
+			if (games.getGames() == null) {
 				response.status(401);
 				response.type("application/json");
 				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
 			}
 
+			// [500] { "message": "Error: description" }
+
 			response.status(200);
 			response.type("application/json");
-			return "{}";
+			return new Gson().toJson(games);
 		});
 	}
 }
