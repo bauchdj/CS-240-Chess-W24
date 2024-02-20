@@ -1,6 +1,8 @@
-package server;
+package server.handlers;
 
 import com.google.gson.Gson;
+import server.ErrorResponse;
+import server.UserJoinGame;
 import spark.Spark;
 
 import service.GameService;

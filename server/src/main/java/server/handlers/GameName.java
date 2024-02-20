@@ -1,4 +1,4 @@
-package server;
+package server.handlers;
 
 public class GameName {
 	private final String gameName;
