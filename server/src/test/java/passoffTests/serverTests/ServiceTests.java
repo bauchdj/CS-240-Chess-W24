@@ -3,6 +3,7 @@ package passoffTests.serverTests;
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
 
+import chess.ChessGame;
 import dataAccess.*;
 import service.*;
 import model.*;
@@ -120,5 +121,76 @@ public class ServiceTests {
 		userService.logout(authData);
 		GameID invalidAuthGameID = gameService.createGame(authData, "good game");
 		Assertions.assertNull(invalidAuthGameID);
+	}
+
+	@Test
+	@Order(7)
+	@DisplayName("Join Game Success")
+	public void successJoinGame() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		GameID gameID = gameService.createGame(authData, "good game");
+
+		Assertions.assertNotNull(
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+		Assertions.assertNotNull(
+				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.getGameID()));
+		Assertions.assertNotNull(
+				gameService.joinGame(authData, null, gameID.getGameID()));
+	}
+
+	@Test
+	@Order(8)
+	@DisplayName("Join Game Invalid")
+	public void invalidJoinGame() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		GameID gameID = gameService.createGame(authData, "good game");
+
+		Assertions.assertEquals("game does not exist",
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), 0));
+		Assertions.assertEquals("game does not exist",
+				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), 0));
+
+		// Same user cannot join twice under same team
+		gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID());
+		Assertions.assertEquals("already taken",
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+
+		// Invalid auth after logout
+		userService.logout(authData);
+		Assertions.assertEquals("unauthorized",
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+		Assertions.assertEquals("unauthorized",
+				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.getGameID()));
+	}
+
+	@Test
+	@Order(9)
+	@DisplayName("List Games")
+	public void successListGames() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		gameService.createGame(authData, "gamez");
+
+		Assertions.assertNotNull(gameService.listGames(authData));
+		Assertions.assertFalse(gameService.listGames(authData).isEmpty());
+	}
+
+	@Test
+	@Order(10)
+	@DisplayName("List Games Invalid")
+	public void invalidListGames() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+		gameService.createGame(authData, "gamez");
+
+		// Invalid auth after logout
+		userService.logout(authData);
+		Assertions.assertNull(gameService.listGames(authData));
 	}
 }
