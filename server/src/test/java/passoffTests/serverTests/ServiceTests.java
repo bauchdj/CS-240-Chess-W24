@@ -108,7 +108,7 @@ public class ServiceTests {
 	@Test
 	@Order(8)
 	@DisplayName("Create Game Failure")
-	public void invalidGameName() throws TestException {
+	public void invalidCreateGame() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
 		userService.register(userData);
 		AuthData authData = userService.login(userData);
