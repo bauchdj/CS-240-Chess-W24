@@ -3,23 +3,23 @@ package passoffTests.serverTests;
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
 
-import dataAccess.Database;
-import dataAccess.UserDAO;
-import dataAccess.AuthDAO;
-import service.UserService;
-import model.UserData;
-import model.AuthData;
+import dataAccess.*;
+import service.*;
+import model.*;
 
-public class UserServiceTests {
+public class ServiceTests {
 	private static final Database db = new Database();
-	private static final UserDAO userDAO = new UserDAO(db);
 	private static final AuthDAO authDAO = new AuthDAO(db);
+	private static final UserDAO userDAO = new UserDAO(db);
+	private static final GameDAO gameDAO = new GameDAO(db);
 	private static final UserService userService = new UserService(userDAO, authDAO);
+	private static final GameService gameService = new GameService(gameDAO, authDAO);
 
 	@BeforeEach
 	public void setup() throws TestException {
-		userDAO.clearUsers();
 		authDAO.clearAuth();
+		userDAO.clearUsers();
+		gameDAO.clearGames();
 	}
 
 	@Test
@@ -90,5 +90,35 @@ public class UserServiceTests {
 		userService.logout(authData);
 		boolean isLogout = userService.logout(authData);
 		Assertions.assertFalse(isLogout);
+	}
+
+	@Test
+	@Order(7)
+	@DisplayName("Create Game Success")
+	public void successCreateGame() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+
+		GameID gameID = gameService.createGame(authData, "good game");
+		Assertions.assertNotNull(gameID);
+	}
+
+	@Test
+	@Order(8)
+	@DisplayName("Create Game Failure")
+	public void invalidGameName() throws TestException {
+		UserData userData = new UserData("user", "pwd", "user@chess.com");
+		userService.register(userData);
+		AuthData authData = userService.login(userData);
+
+		// Create Game with Empty Name
+		GameID emptyNameGameID = gameService.createGame(authData, "");
+		Assertions.assertNull(emptyNameGameID);
+
+		// Invalid auth after logout
+		userService.logout(authData);
+		GameID invalidAuthGameID = gameService.createGame(authData, "good game");
+		Assertions.assertNull(invalidAuthGameID);
 	}
 }
