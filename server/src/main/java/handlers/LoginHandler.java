@@ -13,17 +13,10 @@ public class LoginHandler {
 		Spark.post("/session", (request, response) -> {
 			UserData user = new Gson().fromJson(request.body(), UserData.class);
 			AuthData authData = userService.login(user);
+			if (authData == null) CreateResponse.halt401();
+			else CreateResponse.response200(response, authData);
 
-			if (authData == null) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
-
-			// [500] { "message": "Error: description" }
-
-			response.status(200);
-			return new Gson().toJson(authData);
+			return response.body();
 		});
 	}
 }

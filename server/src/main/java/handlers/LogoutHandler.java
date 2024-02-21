@@ -1,7 +1,6 @@
 package handlers;
 
 import spark.Spark;
-import com.google.gson.Gson;
 
 import service.UserService;
 
@@ -12,22 +11,13 @@ public class LogoutHandler {
 		Spark.delete("/session", (request, response) -> {
 			String authToken = request.headers("authorization");
 
-			if (authToken == null || authToken.isEmpty()) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
+			CreateResponse.haltUnauthorized(authToken);
 
 			boolean success = userService.logout(new AuthData(authToken));
-			if (!success) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
+			if (!success) CreateResponse.halt401();
+			else CreateResponse.response200(response, "{}");
 
-			response.status(200);
-			response.type("application/json");
-			return "{}";
+			return response.body();
 		});
 	}
 }

@@ -1,6 +1,5 @@
 package handlers;
 
-import com.google.gson.Gson;
 import spark.Spark;
 
 import service.GameService;
@@ -12,25 +11,13 @@ public class ListGamesHandler {
 		Spark.get("/game", (request, response) -> {
 			String authToken = request.headers("authorization");
 
-			if (authToken == null || authToken.isEmpty()) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
+			CreateResponse.haltUnauthorized(authToken);
 
 			GameList games = new GameList(gamerService.listGames(new AuthData(authToken)));
+			if (games.getGames() == null) CreateResponse.halt401();
+			else CreateResponse.response200(response, games);
 
-			if (games.getGames() == null) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
-
-			// [500] { "message": "Error: description" }
-
-			response.status(200);
-			response.type("application/json");
-			return new Gson().toJson(games);
+			return response.body();
 		});
 	}
 }

@@ -13,31 +13,18 @@ public class CreateHandler {
 		Spark.post("/game", (request, response) -> {
 			String authToken = request.headers("authorization");
 
-			if (authToken == null || authToken.isEmpty()) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
+			CreateResponse.haltUnauthorized(authToken);
 
 			GameName gameName = new Gson().fromJson(request.body(), GameName.class);
 			if (gameName == null || gameName.getGameName() == null || gameName.getGameName().trim().isEmpty()) {
-				response.status(400);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: bad request"));
+				CreateResponse.halt400();
+			} else {
+				GameID gameID = gameService.createGame(new AuthData(authToken), gameName.getGameName());
+				if (gameID == null) CreateResponse.halt401();
+				else CreateResponse.response200(response, gameID);
 			}
 
-			GameID gameID = gameService.createGame(new AuthData(authToken), gameName.getGameName());
-			if (gameID == null) {
-				response.status(401);
-				response.type("application/json");
-				return new Gson().toJson(new ErrorResponse("Error: unauthorized"));
-			}
-
-			// [500] { "message": "Error: description" }
-
-			response.status(200);
-			response.type("application/json");
-			return new Gson().toJson(gameID);
+			return response.body();
 		});
 	}
 }
