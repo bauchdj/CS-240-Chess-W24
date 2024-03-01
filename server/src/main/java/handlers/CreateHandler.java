@@ -16,10 +16,10 @@ public class CreateHandler {
 			CreateResponse.haltUnauthorized(authToken);
 
 			GameName gameName = new Gson().fromJson(request.body(), GameName.class);
-			if (gameName == null || gameName.getGameName() == null || gameName.getGameName().trim().isEmpty()) {
+			if (gameName == null || gameName.gameName() == null || gameName.gameName().trim().isEmpty()) {
 				CreateResponse.halt400();
 			} else {
-				GameID gameID = gameService.createGame(new AuthData(authToken), gameName.getGameName());
+				GameID gameID = gameService.createGame(new AuthData(authToken), gameName.gameName());
 				if (gameID == null) CreateResponse.halt401();
 				else CreateResponse.response200(response, gameID);
 			}

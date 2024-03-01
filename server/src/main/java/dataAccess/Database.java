@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class Database implements DataAccess {
 	private final HashSet<UserData> users = new HashSet<>();
-	private final HashSet<GameData> games = new HashSet<>();
+	private final Map<Integer, GameData> games = new HashMap<>();
 	private final Map<String, AuthData> authTokens = new HashMap<>();
 
 	public void clearUsers() { users.clear(); }
@@ -37,17 +37,14 @@ public class Database implements DataAccess {
 	}
 
 	// Game Operations
-	public void createGame(GameData game) { games.add(game); }
+	public void createGame(GameData game) { games.put(game.getGameID(), game); }
 
 	public GameData getGame(int gameId) {
-		return games.stream()
-				.filter(game -> game.getGameID() == gameId)
-				.findFirst()
-				.orElse(null);
+		return games.get(gameId);
 	}
 
 	public HashSet<GameData> listGames() {
-		return new HashSet<>(games);
+		return new HashSet<>(games.values());
 	}
 
 	public boolean userInGame(String username, int gameID, String clientColor) {

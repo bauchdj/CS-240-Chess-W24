@@ -14,7 +14,7 @@ public class ListGamesHandler {
 			CreateResponse.haltUnauthorized(authToken);
 
 			GameList games = new GameList(gamerService.listGames(new AuthData(authToken)));
-			if (games.getGames() == null) CreateResponse.halt401();
+			if (games.games() == null) CreateResponse.halt401();
 			else CreateResponse.response200(response, games);
 
 			return response.body();

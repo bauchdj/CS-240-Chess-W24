@@ -3,8 +3,6 @@ package handlers;
 import spark.Spark;
 import com.google.gson.Gson;
 
-import server.UserJoinGame;
-
 import service.GameService;
 
 import model.AuthData;
@@ -19,8 +17,8 @@ public class JoinHandler {
 			UserJoinGame joinData = new Gson().fromJson(request.body(), UserJoinGame.class);
 			if (joinData == null) CreateResponse.halt400();
 			else {
-				String clientColor = joinData.getPlayerColor();
-				int gameID = joinData.getGameID();
+				String clientColor = joinData.playerColor();
+				int gameID = joinData.gameID();
 				String status = gameService.joinGame(new AuthData(authToken), clientColor, gameID);
 
 				switch (status) {

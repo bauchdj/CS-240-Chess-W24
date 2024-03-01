@@ -1,22 +1,6 @@
-package server;
+package handlers;
 
-public class UserJoinGame {
-	private final String playerColor;
-	private final int gameID;
-
-	public UserJoinGame(String playerColor, int gameID) {
-		this.playerColor = playerColor;
-		this.gameID = gameID;
-	}
-
-	public String getPlayerColor() {
-		return playerColor;
-	}
-
-	public int getGameID() {
-		return gameID;
-	}
-
+public record UserJoinGame(String playerColor, int gameID) {
 	@Override
 	public String toString() {
 		return "UserJoinGame{" +
