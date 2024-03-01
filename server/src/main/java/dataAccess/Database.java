@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class Database implements DataAccess {
-	private final HashSet<UserData> users = new HashSet<>();
+	private final Map<String, UserData> users = new HashMap<>();
 	private final Map<Integer, GameData> games = new HashMap<>();
 	private final Map<String, AuthData> authTokens = new HashMap<>();
 
@@ -26,14 +26,11 @@ public class Database implements DataAccess {
 
 	// User Operations
 	public void createUser(UserData user) {
-		users.add(user);
+		users.put(user.getUsername(), user);
 	}
 
 	public UserData getUser(String username) {
-		return users.stream()
-				.filter(user -> user.getUsername()
-				.equals(username))
-				.findFirst().orElse(null);
+		return users.get(username);
 	}
 
 	// Game Operations
