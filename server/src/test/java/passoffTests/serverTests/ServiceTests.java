@@ -30,7 +30,7 @@ public class ServiceTests {
 	public void successRegister() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
 		userService.register(userData);
-		Assertions.assertEquals(userData, userDAO.getUser("user"));
+		Assertions.assertEquals(userData.getUsername(), userDAO.getUser("user").getUsername());
 	}
 
 	@Test

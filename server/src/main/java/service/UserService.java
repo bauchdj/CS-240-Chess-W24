@@ -2,11 +2,13 @@ package service;
 
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import dataAccess.AuthDAO;
 import dataAccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+
 
 public class UserService {
 	private final UserDAO userDAO;
@@ -22,6 +24,11 @@ public class UserService {
 		return new AuthData(username, authToken);
 	}
 
+	private static String hashPassword(String pwd) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		return encoder.encode(pwd);
+	}
+
 	public AuthData register(UserData user) {
 		String username = user.getUsername();
 		String password = user.getPassword();
@@ -32,7 +39,8 @@ public class UserService {
 				|| password.isEmpty()
 				|| email.isEmpty()) return null;
 
-		UserData newUser = new UserData(username, password, email);
+		String hashedPassword = hashPassword(password);
+		UserData newUser = new UserData(username, hashedPassword, email);
 		this.userDAO.createUser(newUser);
 		AuthData authData = createAuthData(username);
 		this.authDAO.createAuth(authData);
@@ -40,7 +48,8 @@ public class UserService {
 	}
 
 	private static boolean verifyPassword(String userPwd, String dbPwd) {
-		return Objects.equals(userPwd, dbPwd);
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		return encoder.matches(userPwd, dbPwd);
 	}
 
 	public AuthData login(UserData user) {
