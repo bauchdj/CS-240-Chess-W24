@@ -9,7 +9,7 @@ import service.*;
 import model.*;
 
 public class ServiceTests {
-	private static final Database db = new Database();
+	private static final DataAccess db = new MySQLDatabase();
 	private static final AuthDAO authDAO = new AuthDAO(db);
 	private static final UserDAO userDAO = new UserDAO(db);
 	private static final GameDAO gameDAO = new GameDAO(db);
@@ -134,11 +134,11 @@ public class ServiceTests {
 		GameID gameID = gameService.createGame(authData, "good game");
 
 		Assertions.assertNotNull(
-				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.gameID()));
 		Assertions.assertNotNull(
-				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.getGameID()));
+				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.gameID()));
 		Assertions.assertNotNull(
-				gameService.joinGame(authData, null, gameID.getGameID()));
+				gameService.joinGame(authData, null, gameID.gameID()));
 	}
 
 	@Test
@@ -156,16 +156,16 @@ public class ServiceTests {
 				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), 0));
 
 		// Same user cannot join twice under same team
-		gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID());
+		gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), 1);
 		Assertions.assertEquals("already taken",
-				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), 1));
 
 		// Invalid auth after logout
 		userService.logout(authData);
 		Assertions.assertEquals("unauthorized",
-				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.getGameID()));
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.gameID()));
 		Assertions.assertEquals("unauthorized",
-				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.getGameID()));
+				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), gameID.gameID()));
 	}
 
 	@Test

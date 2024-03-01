@@ -1,12 +1,7 @@
 package server;
 
+import dataAccess.*;
 import spark.*;
-
-import dataAccess.DataAccess;
-import dataAccess.Database;
-import dataAccess.UserDAO;
-import dataAccess.GameDAO;
-import dataAccess.AuthDAO;
 
 import handlers.*;
 import service.*;
@@ -17,7 +12,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        DataAccess db = new Database();
+        DataAccess db = new MySQLDatabase();
 
         UserDAO userDAO = new UserDAO(db);
         GameDAO gameDAO = new GameDAO(db);
