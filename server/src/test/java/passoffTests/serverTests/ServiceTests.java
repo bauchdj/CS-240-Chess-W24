@@ -156,9 +156,9 @@ public class ServiceTests {
 				gameService.joinGame(authData, ChessGame.TeamColor.BLACK.toString(), 0));
 
 		// Same user cannot join twice under same team
-		gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), 1);
+		gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.gameID());
 		Assertions.assertEquals("already taken",
-				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), 1));
+				gameService.joinGame(authData, ChessGame.TeamColor.WHITE.toString(), gameID.gameID()));
 
 		// Invalid auth after logout
 		userService.logout(authData);

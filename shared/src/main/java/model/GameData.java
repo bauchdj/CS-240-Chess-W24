@@ -74,7 +74,7 @@ public class GameData {
 				", whiteUsername='" + whiteUsername + '\'' +
 				", blackUsername='" + blackUsername + '\'' +
 				", gameName='" + gameName + '\'' +
-				", game=" + game +
+				//", game=" + game +
 				'}';
 	}
 

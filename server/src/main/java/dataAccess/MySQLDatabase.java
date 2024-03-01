@@ -33,7 +33,7 @@ public class MySQLDatabase implements DataAccess {
 	private static final String gamesTableStatement =
 			"""
 			CREATE TABLE IF NOT EXISTS games (
-				gameid INT AUTO_INCREMENT PRIMARY KEY,
+				gameid INT NOT NULL UNIQUE PRIMARY KEY,
 				whiteusername VARCHAR(32),
 				blackusername VARCHAR(32),
 				gamename VARCHAR(100) NOT NULL,
@@ -157,13 +157,16 @@ public class MySQLDatabase implements DataAccess {
 
 	public void createGame(GameData game) {
 		String chessGameJSON = new Gson().toJson(game.getGame());
-		String statement = "INSERT INTO games (whiteusername, blackusername, gamename, chessgame) VALUES (?, ?, ?, ?)";
+		String statement = "INSERT INTO games (gameid, whiteusername, blackusername, gamename, chessgame) VALUES (?, ?, ?, ?, ?)";
 		// TODO figure out what happens when usernames are null
+
 		try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
-			ps.setString(1, game.getWhiteUsername());
-			ps.setString(2, game.getBlackUsername());
-			ps.setString(3, game.getGameName());
-			ps.setString(4, chessGameJSON);
+			ps.setInt(1, game.getGameID());
+			ps.setString(2, game.getWhiteUsername());
+			ps.setString(3, game.getBlackUsername());
+			ps.setString(4, game.getGameName());
+			ps.setString(5, chessGameJSON);
+
 			ps.executeUpdate();
 
 			//System.out.println(getGame(game.getGameID()));
@@ -223,27 +226,10 @@ public class MySQLDatabase implements DataAccess {
 	}
 
 	public boolean userInGame(String username, int gameID, String clientColor) {
-		String columnToCheck = ("white".equalsIgnoreCase(clientColor)) ? "whiteusername" : "blackusername";
-		String querySQL = "SELECT COUNT(*) FROM games WHERE gameid = ? AND " + columnToCheck + " = ?";
-
-		try (var conn = DatabaseManager.getConnection();
-			 var ps = conn.prepareStatement(querySQL)) {
-			ps.setInt(1, gameID); // Set the game ID for the WHERE clause
-			ps.setString(2, username); // Set the username to check
-
-			try (var rs = ps.executeQuery()) {
-				if (rs.next()) {
-					int count = rs.getInt(1);
-					return count > 0; // If count is greater than 0, the user is part of the game
-				}
-			}
-		} catch (SQLException | DataAccessException e) {
-			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
-			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
-		}
-
-		return false;
+		GameData game = getGame(gameID);
+		return game != null &&
+			   (("white".equalsIgnoreCase(clientColor) && game.getWhiteUsername() != null) ||
+				"black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
 	}
 
 	public void updateGame(String username, int gameID, String clientColor) {
