@@ -6,6 +6,7 @@ import passoffTests.testClasses.TestException;
 import chess.ChessGame;
 import dataAccess.*;
 import model.*;
+import spark.utils.Assert;
 
 public class DataAccessTests {
 	private static final DataAccess db = new MySQLDatabase();
@@ -151,84 +152,102 @@ public class DataAccessTests {
 	@Order(15)
 	@DisplayName("Success Create Game")
 	public void successCreateGame() throws TestException {
-
+		GameData gameData = new GameData(1, "test", new ChessGame());
+		gameDAO.createGame(gameData);
+		Assertions.assertEquals(gameData.getGameName(), gameDAO.getGame(1).getGameName());
 	}
 
 	@Test
 	@Order(16)
-	@DisplayName("Invalid GameData cannot Create Game")
+	@DisplayName("Invalid GameName cannot Create Game")
 	public void failCreateGame() throws TestException {
-
+		GameData gameData = new GameData(1, null, new ChessGame());
+		gameDAO.createGame(gameData);
+		Assertions.assertNull(gameDAO.getGame(1));
 	}
 
 	@Test
 	@Order(17)
 	@DisplayName("Success Get Game")
 	public void successGetGame() throws TestException {
-
+		GameData gameData = new GameData(1, "test", new ChessGame());
+		gameDAO.createGame(gameData);
+		Assertions.assertNotNull(gameDAO.getGame(1));
 	}
 
 	@Test
 	@Order(18)
-	@DisplayName("Fail Get Game")
+	@DisplayName("Non-existent GameID")
 	public void failGetGame() throws TestException {
-
+		Assertions.assertNull(gameDAO.getGame(1));
 	}
 
 	@Test
 	@Order(19)
 	@DisplayName("Success Game Exists")
 	public void successGameExists() throws TestException {
-
+		GameData gameData = new GameData(1, "test", new ChessGame());
+		gameDAO.createGame(gameData);
+		Assertions.assertTrue(gameDAO.gameExist(1));
 	}
 
 	@Test
 	@Order(20)
-	@DisplayName("Fail Game Exists")
+	@DisplayName("Non-existent GameID, Game doesn't exist")
 	public void failGameExists() throws TestException {
-
+		Assertions.assertFalse(gameDAO.gameExist(1));
 	}
 
 	@Test
 	@Order(21)
 	@DisplayName("Success List Game")
 	public void successListGames() throws TestException {
-
+		gameDAO.createGame(new GameData(1, "test1", new ChessGame()));
+		gameDAO.createGame(new GameData(2, "test2", new ChessGame()));
+		gameDAO.createGame(new GameData(3, "test3", new ChessGame()));
+		Assertions.assertFalse(gameDAO.listGames().isEmpty());
 	}
 
 	@Test
 	@Order(22)
-	@DisplayName("Fail List Games")
+	@DisplayName("Non-existent Games")
 	public void failListGames() throws TestException {
-
+		Assertions.assertTrue(gameDAO.listGames().isEmpty());
 	}
 
 	@Test
 	@Order(21)
 	@DisplayName("Success User Exists in Games")
 	public void successGameDataUserExists() throws TestException {
-
+		GameData gameData = new GameData(1, "test", new ChessGame());
+		gameDAO.createGame(gameData);
+		gameDAO.updateGame("bob", 1, "white");
+		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
 	}
 
 	@Test
 	@Order(22)
-	@DisplayName("Fail User Exists in Games")
+	@DisplayName("Non-existent User in Games")
 	public void failGameDataUserExists() throws TestException {
-
+		Assertions.assertFalse(gameDAO.userExists("bob", 1, "white"));
 	}
 
 	@Test
 	@Order(21)
 	@DisplayName("Success Update Game")
 	public void successUpdateGame() throws TestException {
-
+		GameData gameData = new GameData(1, "test", new ChessGame());
+		gameDAO.createGame(gameData);
+		gameDAO.updateGame("bob", 1, "white");
+		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
 	}
 
 	@Test
 	@Order(22)
-	@DisplayName("Fail Update Game")
+	@DisplayName("Non-existent Game, Fail to Update")
 	public void failUpdateGame() throws TestException {
-
+		gameDAO.updateGame("bob", 1, "white");
+		Assertions.assertFalse(gameDAO.userExists("bob", 1, "white"));
 	}
 
 	@Test
@@ -236,11 +255,8 @@ public class DataAccessTests {
 	@DisplayName("Clear Success Users")
 	public void successClearUsers() throws TestException {
 		UserData userData = new UserData("user", "pwd", "user@chess.com");
-
 		userDAO.createUser(userData);
-
 		userDAO.clearUsers();
-
 		Assertions.assertNull(userDAO.getUser("user"));
 	}
 	@Test
@@ -248,11 +264,8 @@ public class DataAccessTests {
 	@DisplayName("Clear Success Auth")
 	public void successClearAuth() throws TestException {
 		AuthData authData = new AuthData("user", "token-uuid");
-
 		authDAO.createAuth(authData);
-
 		authDAO.clearAuth();
-
 		Assertions.assertNull(authDAO.getAuth(authData));
 	}
 	@Test
@@ -260,11 +273,8 @@ public class DataAccessTests {
 	@DisplayName("Clear Success Games")
 	public void successClearGames() throws TestException {
 		GameData gameData = new GameData(1, "test", new ChessGame());
-
 		gameDAO.createGame(gameData);
-
 		gameDAO.clearGames();
-
 		Assertions.assertTrue(gameDAO.listGames().isEmpty());
 	}
 }
