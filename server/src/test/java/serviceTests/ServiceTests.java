@@ -1,4 +1,4 @@
-package passoffTests.serverTests;
+package serviceTests;
 
 import org.junit.jupiter.api.*;
 import passoffTests.testClasses.TestException;
