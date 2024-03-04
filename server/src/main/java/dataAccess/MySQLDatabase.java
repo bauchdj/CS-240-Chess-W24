@@ -53,7 +53,6 @@ public class MySQLDatabase implements DataAccess {
 				}
 			} catch (SQLException e) {
 				System.out.println(e);
-				// TODO handle SQLException and notify user with 500 error code
 				//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 			}
 		} catch (DataAccessException e) {
@@ -77,7 +76,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -94,7 +92,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -111,7 +108,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -133,7 +129,6 @@ public class MySQLDatabase implements DataAccess {
 			ps.executeUpdate();
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -148,7 +143,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 
@@ -158,7 +152,6 @@ public class MySQLDatabase implements DataAccess {
 	public void createGame(GameData game) {
 		String chessGameJSON = new Gson().toJson(game.getGame());
 		String statement = "INSERT INTO games (gameid, whiteusername, blackusername, gamename, chessgame) VALUES (?, ?, ?, ?, ?)";
-		// TODO figure out what happens when usernames are null
 
 		try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
 			ps.setInt(1, game.getGameID());
@@ -172,7 +165,6 @@ public class MySQLDatabase implements DataAccess {
 			//System.out.println(getGame(game.getGameID()));
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -190,7 +182,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 
@@ -218,7 +209,6 @@ public class MySQLDatabase implements DataAccess {
 			return gameList;
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 
@@ -248,7 +238,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -263,7 +252,6 @@ public class MySQLDatabase implements DataAccess {
 			ps.executeUpdate();
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
@@ -279,7 +267,6 @@ public class MySQLDatabase implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 
@@ -295,7 +282,6 @@ public class MySQLDatabase implements DataAccess {
 			ps.executeUpdate();
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
-			// TODO handle SQLException and notify user with 500 error code
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
 		}
 	}
