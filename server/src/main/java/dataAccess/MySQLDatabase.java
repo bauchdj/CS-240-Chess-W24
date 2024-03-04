@@ -161,8 +161,6 @@ public class MySQLDatabase implements DataAccess {
 			ps.setString(5, chessGameJSON);
 
 			ps.executeUpdate();
-
-			//System.out.println(getGame(game.getGameID()));
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
