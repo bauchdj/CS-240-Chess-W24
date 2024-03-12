@@ -8,29 +8,60 @@ import static ui.UserInputHandler.*;
 import com.google.gson.JsonObject;
 
 public class PreLoginUI extends Repl {
-	public PreLoginUI(Application app) {
+	private enum MenuOption {
+		REGISTER(1, "Register"),
+		LOGIN(2, "Login");
+
+		private final int number;
+		private final String description;
+
+		MenuOption(int number, String description) {
+			this.number = number;
+			this.description = description;
+		}
+
+		public int getNumber() {
+			return number;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+	}
+
+	public PreLoginUI(ServerFacade app) {
 		super(app);
 	}
 
 	@Override
 	protected void displayPrompt() {
-		System.out.println("1. Register");
-		System.out.println("2. Login");
-		System.out.println("Type 'quit' to exit at any time.");
-		System.out.print("Enter your choice: ");
+		for (MenuOption option : MenuOption.values()) {
+			System.out.println(option.getNumber() + ". " + option.getDescription());
+		}
+	}
+
+	@Override
+	protected void displayHelp() {
+		System.out.println("Pre Login Help:");
+		System.out.println("- Register: Create a new account");
+		System.out.println("- Login: Log in to an existing account");
 	}
 
 	@Override
 	protected void processInput(String input) {
-		switch (input) {
-			case "1":
-				register();
-				break;
-			case "2":
-				login();
-				break;
-			default:
-				System.out.println("Invalid choice. Please try again.");
+		try {
+			int choice = Integer.parseInt(input);
+			MenuOption selectedOption = MenuOption.values()[choice - 1];
+			switch (selectedOption) {
+				case REGISTER:
+					register();
+					break;
+				case LOGIN:
+					login();
+					break;
+			}
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+			System.out.println("Invalid choice. Please try again.");
 		}
 	}
 
@@ -53,6 +84,7 @@ public class PreLoginUI extends Repl {
 			String authToken = extractAuthToken(response);
 			app.storeAuthToken(authToken);
 
+			setAuthToken(authToken);
 			navigate();
 			app.navigateToPostLogin();
 		}, () -> {

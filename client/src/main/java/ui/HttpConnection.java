@@ -1,6 +1,5 @@
 package ui;
 
-import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -8,7 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpConnection {
-	private static final Gson gson = new Gson();
+	private static String authToken = null;
+
+	public static void setAuthToken(String token) {
+		authToken = token;
+	}
 
 	public static void sendGetRequest(String endpoint,
 									  ResponseCallback successCallback,
@@ -49,12 +52,15 @@ public class HttpConnection {
 	}
 
 	private static HttpURLConnection createConnection(String endpoint, String method) throws Exception {
-		URL url = new URL(Application.BASE_URL + endpoint);
+		URL url = new URL(ServerFacade.BASE_URL + endpoint);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(method);
 		if (method.equals("POST") || method.equals("PUT")) {
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setDoOutput(true);
+		}
+		if (authToken != null) {
+			connection.setRequestProperty("Authorization", authToken);
 		}
 		return connection;
 	}
@@ -70,6 +76,7 @@ public class HttpConnection {
 									   ResponseCallback successCallback,
 									   Runnable failureCallback) throws Exception {
 		int responseCode = connection.getResponseCode();
+		//System.out.println("\n>>> Status code: " + responseCode + '\n');
 		if (responseCode == HttpURLConnection.HTTP_OK) {
 			String response = readResponse(connection);
 			successCallback.onResponse(response);

@@ -6,21 +6,31 @@ import java.util.Scanner;
 public abstract class Repl { // Read-Eval-Print Loop
 	protected static final Scanner scanner = new Scanner(System.in);
 	protected static final Gson gson = new Gson();
-	protected Application app;
+	protected ServerFacade app;
 	protected boolean shouldNavigate = false;
 
-	public Repl(Application app) {
+	public Repl(ServerFacade app) {
 		this.app = app;
 	}
 
 	public void run() {
+		String quit = "quit";
+		String help = "help";
+
 		while (true) {
 			displayPrompt();
-			String input = scanner.nextLine();
+			System.out.println("Type '" + quit + "' to exit");
+			System.out.println("Type '" + help + "' for help");
+			String input = UserInputHandler.getUserInput("Enter your choice: ");
 
-			if (input.equalsIgnoreCase("quit")) {
+			if (input.equalsIgnoreCase(quit)) {
 				app.exitApplication(); // breaks the UI loop and App loop
 				break;
+			}
+
+			if (input.equalsIgnoreCase(help)) {
+				displayHelp();
+				continue;
 			}
 
 			processInput(input);
@@ -30,6 +40,8 @@ public abstract class Repl { // Read-Eval-Print Loop
 	}
 
 	protected abstract void displayPrompt();
+
+	protected abstract void displayHelp();
 
 	protected abstract void processInput(String input);
 

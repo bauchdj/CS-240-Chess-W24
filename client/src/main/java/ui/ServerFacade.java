@@ -1,6 +1,6 @@
 package ui;
 
-public class Application {
+public class ServerFacade {
 	private enum State {
 		PRE_LOGIN,
 		POST_LOGIN,
@@ -15,7 +15,7 @@ public class Application {
 	private String authToken;
 	static final String BASE_URL = "http://localhost:" + String.valueOf(4000);
 
-	public Application() {
+	public ServerFacade() {
 		currentState = State.PRE_LOGIN;
 		preLoginUI = new PreLoginUI(this);
 		postLoginUI = new PostLoginUI(this);
@@ -56,7 +56,7 @@ public class Application {
 	}
 
 	public static void main(String[] args) {
-		Application app = new Application();
+		ServerFacade app = new ServerFacade();
 		app.run();
 	}
 
