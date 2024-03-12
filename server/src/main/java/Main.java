@@ -1,4 +1,4 @@
-package server;
+import server.Server;
 
 public class Main {
 	private static Server server;
