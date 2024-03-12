@@ -19,7 +19,7 @@ public class ServerFacade {
 		currentState = State.PRE_LOGIN;
 		preLoginUI = new PreLoginUI(this);
 		postLoginUI = new PostLoginUI(this);
-		//gamePlayUI = new GamePlayUI(this);
+		gamePlayUI = new GamePlayUI(this);
 	}
 
 	public void run() {
@@ -32,8 +32,7 @@ public class ServerFacade {
 					postLoginUI.run();
 					break;
 				case GAME_PLAY:
-					//gamePlayUI.run();
-					exitApplication();
+					gamePlayUI.run();
 					break;
 			}
 		}
