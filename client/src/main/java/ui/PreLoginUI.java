@@ -2,6 +2,7 @@ package ui;
 
 import model.UserData;
 
+import com.google.gson.JsonObject;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,23 +13,18 @@ import java.net.URL;
 import static ui.Application.BASE_URL;
 
 public class PreLoginUI extends Repl {
-	private Application app;
 	private static final Gson gson = new Gson();
 
 	public PreLoginUI(Application app) {
-		this.app = app;
+		super(app);
 	}
 
 	@Override
 	protected void displayPrompt() {
 		System.out.println("1. Register");
 		System.out.println("2. Login");
+		System.out.println("Type 'quit' to exit at any time.");
 		System.out.print("Enter your choice: ");
-	}
-
-	@Override
-	protected boolean shouldExit(String input) {
-		return input.equalsIgnoreCase("quit");
 	}
 
 	@Override
@@ -61,7 +57,7 @@ public class PreLoginUI extends Repl {
 			sendRequest(connection, requestBody);
 
 			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_CREATED) {
+			if (responseCode == HttpURLConnection.HTTP_OK) {
 				System.out.println("Registration successful!");
 			} else {
 				System.out.println("Registration failed. Please try again.");
@@ -87,7 +83,12 @@ public class PreLoginUI extends Repl {
 			int responseCode = connection.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				String response = readResponse(connection);
-				// Handle the response, e.g., store the session token for further requests
+
+				String authToken = gson.fromJson(response, JsonObject.class)
+						.get("authToken").getAsString();
+				app.storeAuthToken(authToken);
+
+				navigate();
 				app.navigateToPostLogin();
 			} else {
 				System.out.println("Login failed. Please try again.");

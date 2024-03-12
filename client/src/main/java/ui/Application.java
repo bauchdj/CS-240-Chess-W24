@@ -4,7 +4,8 @@ public class Application {
 	private enum State {
 		PRE_LOGIN,
 		POST_LOGIN,
-		GAME_PLAY
+		GAME_PLAY,
+		EXIT
 	}
 
 	private State currentState;
@@ -12,7 +13,7 @@ public class Application {
 	private PostLoginUI postLoginUI;
 	private GamePlayUI gamePlayUI;
 	private String authToken;
-	static final String BASE_URL = "http://localhost:4567";
+	static final String BASE_URL = "http://localhost:4000";
 
 	public Application() {
 		currentState = State.PRE_LOGIN;
@@ -22,19 +23,23 @@ public class Application {
 	}
 
 	public void run() {
-		while (true) {
+		while (currentState != State.EXIT) {
 			switch (currentState) {
 				case PRE_LOGIN:
 					preLoginUI.run();
 					break;
-				/*case POST_LOGIN:
-					postLoginUI.run();
+				case POST_LOGIN:
+					System.out.println(getAuthToken());
+					exitApplication();
+					break;
+					/*postLoginUI.run();
 					break;
 				case GAME_PLAY:
 					gamePlayUI.run();
 					break;*/
 			}
 		}
+		System.out.println("Exiting the application. Goodbye!");
 	}
 
 	public void navigateToPostLogin() {
@@ -47,6 +52,9 @@ public class Application {
 
 	public void navigateToPreLogin() {
 		currentState = State.PRE_LOGIN;
+	}
+	public void exitApplication() {
+		currentState = State.EXIT;
 	}
 
 	public static void main(String[] args) {
