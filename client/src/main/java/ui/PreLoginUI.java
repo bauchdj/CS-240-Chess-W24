@@ -1,13 +1,14 @@
 package ui;
 
 import model.UserData;
-//import static ui.HttpConnection.*;
+
+import static ui.HttpConnection.*;
+import static ui.UserInputHandler.*;
 
 import com.google.gson.JsonObject;
 import java.net.HttpURLConnection;
 
 public class PreLoginUI extends Repl {
-
 	public PreLoginUI(Application app) {
 		super(app);
 	}
@@ -35,59 +36,33 @@ public class PreLoginUI extends Repl {
 	}
 
 	private void register() {
-		System.out.print("Enter username: ");
-		String username = scanner.nextLine();
-		System.out.print("Enter password: ");
-		String password = scanner.nextLine();
-		System.out.print("Enter email: ");
-		String email = scanner.nextLine();
-
-		UserData userData = new UserData(username, password, email);
+		UserData userData = getUserRegistrationData();
 		String requestBody = gson.toJson(userData);
 
-		try {
-			HttpURLConnection connection = HttpConnection.createPostConnection("/user");
-			HttpConnection.sendRequest(connection, requestBody);
-
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				System.out.println("Registration successful!");
-			} else {
-				System.out.println("Registration failed. Please try again.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		sendPostRequest("/user", requestBody, (response) -> {
+			System.out.println("Registration successful!");
+		}, () -> {
+			System.out.println("Registration failed. Please try again.");
+		});
 	}
 
 	private void login() {
-		System.out.print("Enter username: ");
-		String username = scanner.nextLine();
-		System.out.print("Enter password: ");
-		String password = scanner.nextLine();
-
-		UserData userData = new UserData(username, password);
+		UserData userData = getUserLoginData();
 		String requestBody = gson.toJson(userData);
 
-		try {
-			HttpURLConnection connection = HttpConnection.createPostConnection("/session");
-			HttpConnection.sendRequest(connection, requestBody);
+		sendPostRequest("/session", requestBody, (response) -> {
+			String authToken = extractAuthToken(response);
+			app.storeAuthToken(authToken);
 
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				String response = HttpConnection.readResponse(connection);
+			navigate();
+			app.navigateToPostLogin();
+		}, () -> {
+			System.out.println("Login failed. Please try again.");
+		});
+	}
 
-				String authToken = gson.fromJson(response, JsonObject.class)
-						.get("authToken").getAsString();
-				app.storeAuthToken(authToken);
-
-				navigate();
-				app.navigateToPostLogin();
-			} else {
-				System.out.println("Login failed. Please try again.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	private String extractAuthToken(String response) {
+		return gson.fromJson(response, JsonObject.class)
+				.get("authToken").getAsString();
 	}
 }
