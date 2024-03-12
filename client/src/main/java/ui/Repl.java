@@ -3,7 +3,7 @@ package ui;
 import com.google.gson.Gson;
 import java.util.Scanner;
 
-public abstract class Repl {
+public abstract class Repl { // Read-Eval-Print Loop
 	protected static final Scanner scanner = new Scanner(System.in);
 	protected static final Gson gson = new Gson();
 	protected Application app;
