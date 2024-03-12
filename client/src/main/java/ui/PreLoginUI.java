@@ -1,19 +1,12 @@
 package ui;
 
 import model.UserData;
+import static ui.HttpConnection.*;
 
 import com.google.gson.JsonObject;
-import com.google.gson.Gson;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
-
-import static ui.Application.BASE_URL;
 
 public class PreLoginUI extends Repl {
-	private static final Gson gson = new Gson();
 
 	public PreLoginUI(Application app) {
 		super(app);
@@ -96,28 +89,5 @@ public class PreLoginUI extends Repl {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private HttpURLConnection createPostConnection(String endpoint) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setDoOutput(true);
-		return connection;
-	}
-
-	private void sendRequest(HttpURLConnection connection, String requestBody) throws Exception {
-		OutputStream outputStream = connection.getOutputStream();
-		outputStream.write(requestBody.getBytes());
-		outputStream.flush();
-		outputStream.close();
-	}
-
-	private String readResponse(HttpURLConnection connection) throws Exception {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		String response = reader.readLine();
-		reader.close();
-		return response;
 	}
 }

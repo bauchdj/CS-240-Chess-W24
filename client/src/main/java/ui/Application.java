@@ -13,7 +13,7 @@ public class Application {
 	private PostLoginUI postLoginUI;
 	private GamePlayUI gamePlayUI;
 	private String authToken;
-	static final String BASE_URL = "http://localhost:4000";
+	static final String BASE_URL = "http://localhost:" + String.valueOf(4000);
 
 	public Application() {
 		currentState = State.PRE_LOGIN;
@@ -30,13 +30,13 @@ public class Application {
 					break;
 				case POST_LOGIN:
 					System.out.println(getAuthToken());
+					//postLoginUI.run();
 					exitApplication();
 					break;
-					/*postLoginUI.run();
-					break;
 				case GAME_PLAY:
-					gamePlayUI.run();
-					break;*/
+					//gamePlayUI.run();
+					exitApplication();
+					break;
 			}
 		}
 		System.out.println("Exiting the application. Goodbye!");

@@ -1,9 +1,11 @@
 package ui;
 
+import com.google.gson.Gson;
 import java.util.Scanner;
 
 public abstract class Repl {
 	protected static final Scanner scanner = new Scanner(System.in);
+	protected static final Gson gson = new Gson();
 	protected Application app;
 	protected boolean shouldNavigate = false;
 
@@ -17,13 +19,13 @@ public abstract class Repl {
 			String input = scanner.nextLine();
 
 			if (input.equalsIgnoreCase("quit")) {
-				app.exitApplication();
+				app.exitApplication(); // breaks the UI loop and App loop
 				break;
 			}
 
 			processInput(input);
 
-			if (shouldNavigate) break;
+			if (shouldNavigate) break; // breaks the loop of UI
 		}
 	}
 
