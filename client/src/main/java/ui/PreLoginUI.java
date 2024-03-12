@@ -1,7 +1,7 @@
 package ui;
 
 import model.UserData;
-import static ui.HttpConnection.*;
+//import static ui.HttpConnection.*;
 
 import com.google.gson.JsonObject;
 import java.net.HttpURLConnection;
@@ -46,8 +46,8 @@ public class PreLoginUI extends Repl {
 		String requestBody = gson.toJson(userData);
 
 		try {
-			HttpURLConnection connection = createPostConnection("/user");
-			sendRequest(connection, requestBody);
+			HttpURLConnection connection = HttpConnection.createPostConnection("/user");
+			HttpConnection.sendRequest(connection, requestBody);
 
 			int responseCode = connection.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -70,12 +70,12 @@ public class PreLoginUI extends Repl {
 		String requestBody = gson.toJson(userData);
 
 		try {
-			HttpURLConnection connection = createPostConnection("/session");
-			sendRequest(connection, requestBody);
+			HttpURLConnection connection = HttpConnection.createPostConnection("/session");
+			HttpConnection.sendRequest(connection, requestBody);
 
 			int responseCode = connection.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				String response = readResponse(connection);
+				String response = HttpConnection.readResponse(connection);
 
 				String authToken = gson.fromJson(response, JsonObject.class)
 						.get("authToken").getAsString();
