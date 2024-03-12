@@ -6,7 +6,6 @@ import static ui.HttpConnection.*;
 import static ui.UserInputHandler.*;
 
 import com.google.gson.JsonObject;
-import java.net.HttpURLConnection;
 
 public class PreLoginUI extends Repl {
 	public PreLoginUI(Application app) {

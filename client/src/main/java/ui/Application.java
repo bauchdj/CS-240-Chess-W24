@@ -18,8 +18,8 @@ public class Application {
 	public Application() {
 		currentState = State.PRE_LOGIN;
 		preLoginUI = new PreLoginUI(this);
-		/*postLoginUI = new PostLoginUI(this);
-		gamePlayUI = new GamePlayUI(this);*/
+		postLoginUI = new PostLoginUI(this);
+		//gamePlayUI = new GamePlayUI(this);
 	}
 
 	public void run() {
@@ -29,9 +29,7 @@ public class Application {
 					preLoginUI.run();
 					break;
 				case POST_LOGIN:
-					System.out.println(getAuthToken());
-					//postLoginUI.run();
-					exitApplication();
+					postLoginUI.run();
 					break;
 				case GAME_PLAY:
 					//gamePlayUI.run();

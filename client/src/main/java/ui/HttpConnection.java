@@ -10,39 +10,72 @@ import java.net.URL;
 public class HttpConnection {
 	private static final Gson gson = new Gson();
 
+	public static void sendGetRequest(String endpoint,
+									  ResponseCallback successCallback,
+									  Runnable failureCallback) {
+		sendRequest(endpoint, "GET", null, successCallback, failureCallback);
+	}
+
 	public static void sendPostRequest(String endpoint, String requestBody,
 									   ResponseCallback successCallback,
 									   Runnable failureCallback) {
-		try {
-			HttpURLConnection connection = createPostConnection(endpoint);
-			sendRequest(connection, requestBody);
+		sendRequest(endpoint, "POST", requestBody, successCallback, failureCallback);
+	}
 
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				String response = readResponse(connection);
-				successCallback.onResponse(response);
-			} else {
-				failureCallback.run();
+	public static void sendPutRequest(String endpoint, String requestBody,
+									  ResponseCallback successCallback,
+									  Runnable failureCallback) {
+		sendRequest(endpoint, "PUT", requestBody, successCallback, failureCallback);
+	}
+
+	public static void sendDeleteRequest(String endpoint,
+										 ResponseCallback successCallback,
+										 Runnable failureCallback) {
+		sendRequest(endpoint, "DELETE", null, successCallback, failureCallback);
+	}
+
+	private static void sendRequest(String endpoint, String method, String requestBody,
+									ResponseCallback successCallback,
+									Runnable failureCallback) {
+		try {
+			HttpURLConnection connection = createConnection(endpoint, method);
+			if (requestBody != null) {
+				sendRequestBody(connection, requestBody);
 			}
+			handleResponse(connection, successCallback, failureCallback);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static HttpURLConnection createPostConnection(String endpoint) throws Exception {
+	private static HttpURLConnection createConnection(String endpoint, String method) throws Exception {
 		URL url = new URL(Application.BASE_URL + endpoint);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setDoOutput(true);
+		connection.setRequestMethod(method);
+		if (method.equals("POST") || method.equals("PUT")) {
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setDoOutput(true);
+		}
 		return connection;
 	}
 
-	private static void sendRequest(HttpURLConnection connection, String requestBody) throws Exception {
+	private static void sendRequestBody(HttpURLConnection connection, String requestBody) throws Exception {
 		OutputStream outputStream = connection.getOutputStream();
 		outputStream.write(requestBody.getBytes());
 		outputStream.flush();
 		outputStream.close();
+	}
+
+	private static void handleResponse(HttpURLConnection connection,
+									   ResponseCallback successCallback,
+									   Runnable failureCallback) throws Exception {
+		int responseCode = connection.getResponseCode();
+		if (responseCode == HttpURLConnection.HTTP_OK) {
+			String response = readResponse(connection);
+			successCallback.onResponse(response);
+		} else {
+			failureCallback.run();
+		}
 	}
 
 	private static String readResponse(HttpURLConnection connection) throws Exception {

@@ -1,27 +1,24 @@
 package ui;
 
-import com.google.gson.Gson;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import static ui.HttpConnection.*;
+import static ui.UserInputHandler.*;
+
+import com.google.gson.JsonObject;
 
 public class PostLoginUI extends Repl {
-	private static final String BASE_URL = "http://localhost:4567";
-	private static final Gson gson = new Gson();
-
 	public PostLoginUI(Application app) {
 		super(app);
 	}
 
 	@Override
 	protected void displayPrompt() {
+		System.out.println("Welcome to Chess Woohoo!");
 		System.out.println("1. List Games");
 		System.out.println("2. Create Game");
 		System.out.println("3. Join Game");
 		System.out.println("4. Observe Game");
 		System.out.println("5. Logout");
+		System.out.println("Type 'quit' to exit at any time.");
 		System.out.print("Enter your choice: ");
 	}
 
@@ -49,178 +46,60 @@ public class PostLoginUI extends Repl {
 	}
 
 	private void listGames() {
-		try {
-			HttpURLConnection connection = createGetConnection("/game");
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				String response = readResponse(connection);
-				// Process the response and display the list of games
-				System.out.println("List of games:");
-				System.out.println(response);
-			} else {
-				System.out.println("Failed to retrieve the list of games.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		sendGetRequest("/game", (response) -> {
+			System.out.println("Game List:");
+			System.out.println(response);
+		}, () -> {
+			System.out.println("Failed to retrieve game list. Please try again.");
+		});
 	}
 
 	private void createGame() {
-		System.out.print("Enter game name: ");
-		String gameName = scanner.nextLine();
+		String gameName = getUserInput("Enter game name: ");
+		JsonObject requestBody = new JsonObject();
+		requestBody.addProperty("gameName", gameName);
 
-		try {
-			HttpURLConnection connection = createPostConnection("/game");
-			String requestBody = gson.toJson(new CreateGameRequest(gameName));
-			sendRequest(connection, requestBody);
-
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				System.out.println("Game created successfully!");
-			} else {
-				System.out.println("Failed to create the game.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		sendPostRequest("/game", requestBody.toString(), (response) -> {
+			System.out.println("Game created successfully!");
+		}, () -> {
+			System.out.println("Failed to create game. Please try again.");
+		});
 	}
 
 	private void joinGame() {
-		System.out.print("Enter game ID: ");
-		int gameId = Integer.parseInt(scanner.nextLine());
-		System.out.print("Enter client color: ");
-		String clientColor = scanner.nextLine();
+		int gameId = getUserInputInt("Enter game ID: ");
+		String clientColor = getUserInput("Enter client color: ");
+		JsonObject requestBody = new JsonObject();
+		requestBody.addProperty("gameId", gameId);
+		requestBody.addProperty("clientColor", clientColor);
 
-		try {
-			HttpURLConnection connection = createPutConnection("/game");
-			String requestBody = gson.toJson(new JoinGameRequest(gameId, clientColor));
-			sendRequest(connection, requestBody);
-
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				System.out.println("Joined the game successfully!");
-				app.navigateToGamePlay();
-			} else {
-				System.out.println("Failed to join the game.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		sendPutRequest("/game", requestBody.toString(), (response) -> {
+			System.out.println("Joined the game successfully!");
+			app.navigateToGamePlay();
+		}, () -> {
+			System.out.println("Failed to join the game. Please try again.");
+		});
 	}
 
 	private void observeGame() {
-		System.out.print("Enter game ID: ");
-		int gameId = Integer.parseInt(scanner.nextLine());
+		int gameId = getUserInputInt("Enter game ID: ");
+		JsonObject requestBody = new JsonObject();
+		requestBody.addProperty("gameId", gameId);
 
-		try {
-			HttpURLConnection connection = createPutConnection("/game");
-			String requestBody = gson.toJson(new ObserveGameRequest(gameId));
-			sendRequest(connection, requestBody);
-
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				System.out.println("Observing the game now!");
-				app.navigateToGamePlay();
-			} else {
-				System.out.println("Failed to observe the game.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		sendPutRequest("/game", requestBody.toString(), (response) -> {
+			System.out.println("Observing the game now!");
+			app.navigateToGamePlay();
+		}, () -> {
+			System.out.println("Failed to observe the game. Please try again.");
+		});
 	}
 
 	private void logout() {
-		try {
-			HttpURLConnection connection = createDeleteConnection("/session");
-			int responseCode = connection.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) {
-				System.out.println("Logged out successfully!");
-				app.navigateToPreLogin();
-			} else {
-				System.out.println("Failed to logout.");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private HttpURLConnection createGetConnection(String endpoint) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("GET");
-		connection.setRequestProperty("Authorization", app.getAuthToken());
-		return connection;
-	}
-
-	private HttpURLConnection createPostConnection(String endpoint) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setRequestProperty("Authorization", app.getAuthToken());
-		connection.setDoOutput(true);
-		return connection;
-	}
-
-	private HttpURLConnection createPutConnection(String endpoint) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("PUT");
-		connection.setRequestProperty("Content-Type", "application/json");
-		connection.setRequestProperty("Authorization", app.getAuthToken());
-		connection.setDoOutput(true);
-		return connection;
-	}
-
-	private HttpURLConnection createDeleteConnection(String endpoint) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setRequestMethod("DELETE");
-		connection.setRequestProperty("Authorization", app.getAuthToken());
-		return connection;
-	}
-
-	private void sendRequest(HttpURLConnection connection, String requestBody) throws Exception {
-		OutputStream outputStream = connection.getOutputStream();
-		outputStream.write(requestBody.getBytes());
-		outputStream.flush();
-		outputStream.close();
-	}
-
-	private String readResponse(HttpURLConnection connection) throws Exception {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		StringBuilder response = new StringBuilder();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			response.append(line);
-		}
-		reader.close();
-		return response.toString();
-	}
-
-	private static class CreateGameRequest {
-		private String gameName;
-
-		public CreateGameRequest(String gameName) {
-			this.gameName = gameName;
-		}
-	}
-
-	private static class JoinGameRequest {
-		private int gameId;
-		private String clientColor;
-
-		public JoinGameRequest(int gameId, String clientColor) {
-			this.gameId = gameId;
-			this.clientColor = clientColor;
-		}
-	}
-
-	private static class ObserveGameRequest {
-		private int gameId;
-
-		public ObserveGameRequest(int gameId) {
-			this.gameId = gameId;
-		}
+		sendDeleteRequest("/session", (response) -> {
+			System.out.println("Logged out successfully!");
+			app.navigateToPreLogin();
+		}, () -> {
+			System.out.println("Failed to logout. Please try again.");
+		});
 	}
 }
