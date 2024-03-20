@@ -71,6 +71,8 @@ public class PreLoginUI extends Repl {
 
 		sendPostRequest("/user", requestBody, (response) -> {
 			System.out.println("Registration successful!");
+			String authToken = extractAuthToken(response);
+			handleAuthToken(authToken);
 		}, () -> {
 			System.out.println("Registration failed. Please try again.");
 		});
@@ -81,15 +83,19 @@ public class PreLoginUI extends Repl {
 		String requestBody = gson.toJson(userData);
 
 		sendPostRequest("/session", requestBody, (response) -> {
+			System.out.println("Login successful!");
 			String authToken = extractAuthToken(response);
-			app.storeAuthToken(authToken);
-
-			setAuthToken(authToken);
-			navigate();
-			app.navigateToPostLogin();
+			handleAuthToken(authToken);
 		}, () -> {
 			System.out.println("Login failed. Please try again.");
 		});
+	}
+
+	private void handleAuthToken(String authToken) {
+		app.storeAuthToken(authToken);
+		setAuthToken(authToken);
+		navigate();
+		app.navigateToPostLogin();
 	}
 
 	private String extractAuthToken(String response) {
