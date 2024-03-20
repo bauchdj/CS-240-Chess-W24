@@ -52,7 +52,7 @@ public class HttpConnection {
 	}
 
 	private static HttpURLConnection createConnection(String endpoint, String method) throws Exception {
-		URL url = new URL(ServerFacade.BASE_URL + endpoint);
+		URL url = new URL(App.BASE_URL + endpoint);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(method);
 		if (method.equals("POST") || method.equals("PUT")) {

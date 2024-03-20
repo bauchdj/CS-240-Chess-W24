@@ -34,7 +34,7 @@ public class PostLoginUI extends Repl {
 		}
 	}
 	private List<JsonObject> gameList;
-	public PostLoginUI(ServerFacade app) {
+	public PostLoginUI(App app) {
 		super(app);
 		gameList = new ArrayList<>();
 	}

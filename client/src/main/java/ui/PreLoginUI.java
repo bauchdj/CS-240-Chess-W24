@@ -29,7 +29,7 @@ public class PreLoginUI extends Repl {
 		}
 	}
 
-	public PreLoginUI(ServerFacade app) {
+	public PreLoginUI(App app) {
 		super(app);
 	}
 

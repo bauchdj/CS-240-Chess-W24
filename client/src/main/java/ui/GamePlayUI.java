@@ -2,8 +2,8 @@ package ui;
 
 public class GamePlayUI extends Repl {
 
-	public GamePlayUI(ServerFacade serverFacade) {
-		super(serverFacade);
+	public GamePlayUI(App app) {
+		super(app);
 	}
 
 	@Override
