@@ -1,7 +1,25 @@
 package ui;
 
 public class GamePlayUI extends Repl {
+	private enum MenuOption {
+		LEAVE_GAME(1, "Leave Game");
 
+		private final int number;
+		private final String description;
+
+		MenuOption(int number, String description) {
+			this.number = number;
+			this.description = description;
+		}
+
+		public int getNumber() {
+			return number;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+	}
 	public GamePlayUI(App app) {
 		super(app);
 	}
@@ -10,12 +28,22 @@ public class GamePlayUI extends Repl {
 	protected void displayPrompt() {
 		System.out.println("Chessboard:");
 		drawChessboard();
+		for (GamePlayUI.MenuOption option : GamePlayUI.MenuOption.values()) {
+			System.out.println(option.getNumber() + ". " + option.getDescription());
+		}
 	}
 
 	@Override
 	protected void processInput(String input) {
-		// Placeholder for processing user input during gameplay
-		// To be implemented later
+		try {
+			int choice = Integer.parseInt(input);
+			GamePlayUI.MenuOption selectedOption = GamePlayUI.MenuOption.values()[choice - 1];
+			switch (selectedOption) {
+				case LEAVE_GAME -> leaveGame();
+			}
+		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+			System.out.println("Invalid choice. Please try again.");
+		}
 	}
 
 	@Override
@@ -25,6 +53,11 @@ public class GamePlayUI extends Repl {
 		System.out.println("- White pieces are shown at the bottom in the first orientation.");
 		System.out.println("- Black pieces are shown at the bottom in the second orientation.");
 		System.out.println("- Gameplay functionality will be implemented later.");
+	}
+
+	private void leaveGame() {
+		navigate();
+		app.navigateToPostLogin();
 	}
 
 	private void drawChessboard() {

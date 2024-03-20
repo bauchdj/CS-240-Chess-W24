@@ -92,7 +92,6 @@ public class PreLoginUI extends Repl {
 	}
 
 	private void handleAuthToken(String authToken) {
-		app.storeAuthToken(authToken);
 		setAuthToken(authToken);
 		navigate();
 		app.navigateToPostLogin();

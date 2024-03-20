@@ -59,16 +59,4 @@ public class App {
 		App app = new App(4000);
 		app.run();
 	}
-
-	public void storeAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
-	public void removeAuthToken() {
-		storeAuthToken(null);
-	}
-
-	public String getAuthToken() {
-		return authToken;
-	}
 }

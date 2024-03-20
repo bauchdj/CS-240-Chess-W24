@@ -63,21 +63,11 @@ public class PostLoginUI extends Repl {
 			int choice = Integer.parseInt(input);
 			MenuOption selectedOption = MenuOption.values()[choice - 1];
 			switch (selectedOption) {
-				case LIST_GAMES:
-					listGames();
-					break;
-				case CREATE_GAME:
-					createGame();
-					break;
-				case JOIN_GAME:
-					joinGame();
-					break;
-				case OBSERVE_GAME:
-					observeGame();
-					break;
-				case LOGOUT:
-					logout();
-					break;
+				case LIST_GAMES -> listGames();
+				case CREATE_GAME -> createGame();
+				case JOIN_GAME -> joinGame();
+				case OBSERVE_GAME -> observeGame();
+				case LOGOUT -> logout();
 			}
 		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 			System.out.println("Invalid choice. Please try again.");
@@ -125,6 +115,7 @@ public class PostLoginUI extends Repl {
 			String clientColor = getUserInput("Enter your color (white or black): ");
 			if (isValidColor(clientColor)) {
 				sendPutGameRequest(gameId, clientColor.toLowerCase());
+				// TODO join game WebSocket message
 			} else {
 				System.out.println("Invalid color. Please enter either 'white' or 'black'.");
 			}
@@ -180,7 +171,7 @@ public class PostLoginUI extends Repl {
 	private void logout() {
 		sendDeleteRequest("/session", (response) -> {
 			System.out.println("Logged out successfully!");
-			HttpConnection.setAuthToken(null);
+			setAuthToken(null);
 			navigate();
 			app.navigateToPreLogin();
 		}, () -> {
