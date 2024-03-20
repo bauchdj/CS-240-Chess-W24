@@ -13,14 +13,14 @@ public class App {
 	private PostLoginUI postLoginUI;
 	private GamePlayUI gamePlayUI;
 	private String authToken;
-	public static String BASE_URL = "http://localhost:" + String.valueOf(4000);
+
 
 	public App(int port) {
 		currentState = State.PRE_LOGIN;
 		preLoginUI = new PreLoginUI(this);
 		postLoginUI = new PostLoginUI(this);
 		gamePlayUI = new GamePlayUI(this);
-		setBaseUrl("localhost", port);
+		HttpConnection.setBaseUrl("localhost", port);
 	}
 
 	public void run() {
@@ -38,10 +38,6 @@ public class App {
 			}
 		}
 		System.out.println("Exiting the application. Goodbye!");
-	}
-
-	public static void setBaseUrl(String host, int port) {
-		BASE_URL = "http://" + host + ":" + port;
 	}
 
 	public void navigateToPostLogin() {
