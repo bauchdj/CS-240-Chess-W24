@@ -86,7 +86,7 @@ public class HttpConnection {
 			String response = readResponse(connection);
 			successCallback.onResponse(response);
 		} else {
-			// TODO if status code is 403 that means it is already take. Pass the status code to the callback
+			// if status code is 403 that means it is already take. Pass the status code to the callback
 			failureCallback.run();
 		}
 	}
