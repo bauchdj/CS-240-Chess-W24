@@ -50,7 +50,7 @@ public class GamePlayUI extends Repl {
 	}
 
 	private String generateColumnLabels(boolean whiteAtBottom) {
-		StringBuilder columnsBuilder = new StringBuilder("  ");
+		StringBuilder columnsBuilder = new StringBuilder("   ");
 		char colStartLabel = whiteAtBottom ? 'a' : 'h';
 		char colEndLabel = whiteAtBottom ? 'h' : 'a';
 		int colLabelStep = whiteAtBottom ? 1 : -1;
