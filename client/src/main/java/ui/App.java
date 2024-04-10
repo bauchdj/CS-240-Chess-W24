@@ -25,7 +25,7 @@ public class App {
 		postLoginUI = new PostLoginUI(this);
 		gamePlayUI = new GamePlayUI(this);
 		HttpConnection.setBaseUrl("localhost", port);
-		WebSocketConnection.setBaseUri("localhost", port);
+		WebSocketConnection.setBaseUri("localhost", port, "/connect");
 	}
 
 	public void run() {

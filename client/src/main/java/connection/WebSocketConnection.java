@@ -9,9 +9,9 @@ public class WebSocketConnection {
 	private static URI baseUri;
 	private Session session;
 
-	public static void setBaseUri(String host, int port) {
+	public static void setBaseUri(String host, int port, String path) {
 		try {
-			baseUri = new URI("ws://" + host + ":" + port);
+			baseUri = new URI("ws://" + host + ":" + port + path);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
