@@ -1,5 +1,7 @@
 package ui;
 
+import connection.WebSocketConnection;
+
 public class GamePlayUI extends Repl {
 	private enum MenuOption {
 		LEAVE_GAME(1, "Leave Game");
@@ -56,6 +58,9 @@ public class GamePlayUI extends Repl {
 	}
 
 	private void leaveGame() {
+		WebSocketConnection ws = app.getConnection();
+		ws.close();
+
 		navigate();
 		app.navigateToPostLogin();
 	}

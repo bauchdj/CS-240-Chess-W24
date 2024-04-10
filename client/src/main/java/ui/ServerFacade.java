@@ -3,9 +3,8 @@ package ui;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import connection.HttpConnection;
 import model.*;
-
-import static ui.HttpConnection.sendGetRequest;
 
 public class ServerFacade {
 	private static final Gson gson = new Gson();

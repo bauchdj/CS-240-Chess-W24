@@ -2,7 +2,7 @@ package ui;
 
 import model.UserData;
 
-import static ui.HttpConnection.*;
+import static connection.HttpConnection.*;
 import static ui.UserInputHandler.*;
 
 import com.google.gson.JsonObject;

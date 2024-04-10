@@ -1,5 +1,7 @@
 package ui;
 
+import connection.*;
+
 public class App {
 	private enum State {
 		PRE_LOGIN,
@@ -13,6 +15,8 @@ public class App {
 	private PostLoginUI postLoginUI;
 	private GamePlayUI gamePlayUI;
 	private String authToken;
+	private boolean isPlaying = false;
+	private WebSocketConnection connection;
 
 
 	public App(int port) {
@@ -21,6 +25,7 @@ public class App {
 		postLoginUI = new PostLoginUI(this);
 		gamePlayUI = new GamePlayUI(this);
 		HttpConnection.setBaseUrl("localhost", port);
+		WebSocketConnection.setBaseUri("localhost", port);
 	}
 
 	public void run() {
@@ -38,6 +43,22 @@ public class App {
 			}
 		}
 		System.out.println("Exiting the application. Goodbye!");
+	}
+
+	public WebSocketConnection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(WebSocketConnection connection) {
+		this.connection = connection;
+	}
+
+	public boolean isPlaying() {
+		return isPlaying;
+	}
+
+	public void setPlaying(boolean playing) {
+		isPlaying = playing;
 	}
 
 	public void navigateToPostLogin() {

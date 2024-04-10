@@ -1,10 +1,11 @@
 package ui;
 
-import static ui.HttpConnection.*;
+import static connection.HttpConnection.*;
 import static ui.UserInputHandler.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import connection.WebSocketConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +116,6 @@ public class PostLoginUI extends Repl {
 			String clientColor = getUserInput("Enter your color (white or black): ");
 			if (isValidColor(clientColor)) {
 				sendPutGameRequest(gameId, clientColor.toLowerCase());
-				// TODO join game WebSocket message
 			} else {
 				System.out.println("Invalid color. Please enter either 'white' or 'black'.");
 			}
@@ -152,15 +152,29 @@ public class PostLoginUI extends Repl {
 		return -1;
 	}
 
+	// TODO WebScocket Connection
+	private void connectWS() {
+		WebSocketConnection ws = new WebSocketConnection();
+		app.setConnection(ws);
+		ws.connect();
+
+		String message = (app.isPlaying()) ? "playing" : "observing";
+		ws.sendMessage(message);
+	}
+
 	private void sendPutGameRequest(int gameId, String clientColor) {
 		JsonObject requestBody = new JsonObject();
 		requestBody.addProperty("gameID", gameId);
 		if (clientColor != null) {
 			requestBody.addProperty("playerColor", clientColor);
+			app.setPlaying(true);
 		}
 
 		sendPutRequest("/game", requestBody.toString(), (response) -> {
-			System.out.println("Request successful!");
+			System.out.println("Join / Observe game successful!");
+
+			connectWS();
+
 			navigate();
 			app.navigateToGamePlay();
 		}, () -> {
