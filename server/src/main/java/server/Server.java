@@ -1,16 +1,18 @@
 package server;
 
 import dataAccess.*;
-import spark.*;
+import static spark.Spark.*;
 
 import handlers.*;
 import service.*;
 
 public class Server {
     public int run(int desiredPort) {
-        Spark.port(desiredPort);
+        port(desiredPort);
 
-        Spark.staticFiles.location("web");
+        staticFiles.location("web");
+
+        webSocket("/connect", WebSocketHandler.class);
 
         DataAccess db = new MySQLDatabase();
 
@@ -31,12 +33,12 @@ public class Server {
         JoinHandler.joinGame(gameService);
         ListGamesHandler.listGames(gameService);
 
-        Spark.awaitInitialization();
-        return Spark.port();
+        awaitInitialization();
+        return port();
     }
 
     public void stop() {
-        Spark.stop();
-        Spark.awaitStop();
+        stop();
+        awaitStop();
     }
 }
