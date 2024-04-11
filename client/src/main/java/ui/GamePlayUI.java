@@ -148,9 +148,6 @@ public class GamePlayUI extends Repl {
 		System.out.print("Enter the coordinates of the piece (e.g., e2): ");
 		String coordinates = scanner.nextLine();
 
-		// TODO: Implement the logic to highlight legal moves for the selected piece
-		// This is a local operation and has no effect on remote users' screens
-
 		ChessPosition position = new ChessPosition(coordinates);
 
 		if (game.getBoard().getPiece(position) == null) {
@@ -252,6 +249,8 @@ public class GamePlayUI extends Repl {
 
 			System.out.print(bgColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
 		}
+
+		validMovePositions = new HashSet<>();
 	}
 
 	private String getPieceSymbol(ChessPiece piece) {

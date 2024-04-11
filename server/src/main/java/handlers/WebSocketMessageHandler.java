@@ -189,10 +189,13 @@ public class WebSocketMessageHandler {
 				"isInCheckmate: " + isInCheckmate +
 				", isInStalemate: " + isInStalemate);
 
+			System.out.println(notification.getMessage());
+
 			sendNotificationAll(gameID, notification);
 
 			removeGameAndSession(gameID, username, session);
 		} else if (isInCheck) {
+			System.out.println("Sending Check message!");
 			sendNotificationAll(gameID, new Notification("InCheck user: " + username + ", color: " + teamColor));
 		}
 	}

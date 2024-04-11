@@ -8,10 +8,10 @@ import java.net.URL;
 
 public class HttpConnection {
 	private static String authToken = null;
-	public static String BASE_URL = null;
+	public static String baseUrl = null;
 
 	public static void setBaseUrl(String host, int port) {
-		BASE_URL = "http://" + host + ":" + port;
+		baseUrl = "http://" + host + ":" + port;
 	}
 
 	public static void setAuthToken(String token) {
@@ -57,7 +57,7 @@ public class HttpConnection {
 	}
 
 	private static HttpURLConnection createConnection(String endpoint, String method) throws Exception {
-		URL url = new URL(BASE_URL + endpoint);
+		URL url = new URL(baseUrl + endpoint);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(method);
 		if (method.equals("POST") || method.equals("PUT")) {

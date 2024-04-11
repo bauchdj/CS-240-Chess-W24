@@ -84,8 +84,17 @@ public class WebSocketConnection {
 		throwable.printStackTrace();
 	}
 
+
+
 	public void handleMessage(String message) {
 		System.out.println("Message received: " + message);
+
+		if (message == "chicken lips") {
+			onOpen(session);
+			onMessage(session, message);
+			//onClose(session, new CloseReason(new CloseCode(), "nope"));
+			//onError();
+		}
 
 		ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
