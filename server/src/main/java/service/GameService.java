@@ -46,7 +46,7 @@ public class GameService {
 
 		if (clientColor != null) {
 			if (this.gameDAO.userExists(username, gameID, clientColor)) return "already taken";
-			this.gameDAO.updateGame(username, gameID, clientColor);
+			this.gameDAO.updateUserInGame(username, gameID, clientColor);
 		}
 
 		return "success";

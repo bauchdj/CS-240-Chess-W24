@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import connection.*;
 
 public class App {
@@ -15,9 +16,9 @@ public class App {
 	private PostLoginUI postLoginUI;
 	private GamePlayUI gamePlayUI;
 	private String authToken;
-	private boolean isPlaying = false;
 	private WebSocketConnection connection;
-
+	private int gameID = 0;
+	private ChessGame.TeamColor color = null;
 
 	public App(int port) {
 		currentState = State.PRE_LOGIN;
@@ -45,6 +46,15 @@ public class App {
 		System.out.println("Exiting the application. Goodbye!");
 	}
 
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public void setAuthToken(String authToken) {
+		HttpConnection.setAuthToken(authToken);
+		this.authToken = authToken;
+	}
+
 	public WebSocketConnection getConnection() {
 		return connection;
 	}
@@ -53,21 +63,20 @@ public class App {
 		this.connection = connection;
 	}
 
-	public boolean isPlaying() {
-		return isPlaying;
+	public int getGameID() {
+		return gameID;
 	}
 
-	public void setPlaying(boolean playing) {
-		isPlaying = playing;
+	public void setGameID(int gameID) {
+		this.gameID = gameID;
 	}
 
-	public String getAuthToken() {
-		return authToken;
+	public ChessGame.TeamColor getColor() {
+		return color;
 	}
 
-	public void setAuthToken(String authToken) {
-		HttpConnection.setAuthToken(authToken);
-		this.authToken = authToken;
+	public void setColor(ChessGame.TeamColor color) {
+		this.color = color;
 	}
 
 	public void navigateToPostLogin() {

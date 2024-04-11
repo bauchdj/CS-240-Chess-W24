@@ -6,7 +6,6 @@ import passoffTests.testClasses.TestException;
 import chess.ChessGame;
 import dataAccess.*;
 import model.*;
-import spark.utils.Assert;
 
 public class DataAccessTests {
 	private static final DataAccess db = new MySQLDatabase();
@@ -221,7 +220,7 @@ public class DataAccessTests {
 	public void successGameDataUserExists() throws TestException {
 		GameData gameData = new GameData(1, "test", new ChessGame());
 		gameDAO.createGame(gameData);
-		gameDAO.updateGame("bob", 1, "white");
+		gameDAO.updateUserInGame("bob", 1, "white");
 		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
 	}
 
@@ -238,7 +237,7 @@ public class DataAccessTests {
 	public void successUpdateGame() throws TestException {
 		GameData gameData = new GameData(1, "test", new ChessGame());
 		gameDAO.createGame(gameData);
-		gameDAO.updateGame("bob", 1, "white");
+		gameDAO.updateUserInGame("bob", 1, "white");
 		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
 	}
 
@@ -246,7 +245,7 @@ public class DataAccessTests {
 	@Order(22)
 	@DisplayName("Non-existent Game, Fail to Update")
 	public void failUpdateGame() throws TestException {
-		gameDAO.updateGame("bob", 1, "white");
+		gameDAO.updateUserInGame("bob", 1, "white");
 		Assertions.assertFalse(gameDAO.userExists("bob", 1, "white"));
 	}
 

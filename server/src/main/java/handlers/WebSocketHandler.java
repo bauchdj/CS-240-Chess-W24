@@ -3,8 +3,12 @@ package handlers;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 @WebSocket
 public class WebSocketHandler {
+	public static HashMap<Integer, HashSet<Session>> mapGameIDToSessions = new HashMap<>();
 
 	@OnWebSocketConnect
 	public void onConnect(Session session) throws Exception {
@@ -14,9 +18,8 @@ public class WebSocketHandler {
 
 	@OnWebSocketMessage
 	public void onMessage(Session session, String message) throws Exception {
-		System.out.println("Message received: " + message);
-		// Handle incoming WebSocket message
-		// You can send a response back to the client using session.getRemote().sendString(response);
+		WebSocketMessageHandler wsMsgHandler = new WebSocketMessageHandler(session);
+		wsMsgHandler.handleMessage(message);
 	}
 
 	@OnWebSocketClose

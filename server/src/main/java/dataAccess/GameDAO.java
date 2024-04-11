@@ -59,7 +59,11 @@ public class GameDAO {
 	 * @param gameId The ID of the game to be updated.
 	 * @param clientColor The color chosen by the participant (e.g., "white" or "black").
 	 */
-	public void updateGame(String username, int gameId, String clientColor) {
-		this.database.updateGame(username, gameId, clientColor);
+	public void updateUserInGame(String username, int gameId, String clientColor) {
+		this.database.updateUserInGame(username, gameId, clientColor);
+	}
+
+	public void updateGame(int gameID, GameData game) {
+		this.database.updateGame(gameID, game);
 	}
 }

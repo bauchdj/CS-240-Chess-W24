@@ -51,7 +51,7 @@ public class Database implements DataAccess {
 				 "black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
 	}
 
-	public void updateGame(String username, int gameID, String clientColor) {
+	public void updateUserInGame(String username, int gameID, String clientColor) {
 		GameData game = getGame(gameID);
 		if (game != null) {
 			if ("white".equalsIgnoreCase(clientColor)) {
@@ -60,6 +60,10 @@ public class Database implements DataAccess {
 				game.setBlackUsername(username);
 			}
 		};
+	}
+
+	public void updateGame(int gameID, GameData game) {
+		games.put(gameID, game);
 	}
 
 	// Authentication Operations

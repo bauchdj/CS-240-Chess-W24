@@ -28,7 +28,9 @@ public interface DataAccess {
 
 	public boolean userInGame(String username, int gameID, String clientColor);
 
-	public void updateGame(String username, int gameID, String clientColor);
+	public void updateUserInGame(String username, int gameID, String clientColor);
+
+	public void updateGame(int gameID, GameData game);
 
 	// Authentication Operations
 	public void createAuth(AuthData authData);

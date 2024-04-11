@@ -33,6 +33,8 @@ public class Server {
         JoinHandler.joinGame(gameService);
         ListGamesHandler.listGames(gameService);
 
+        WebSocketMessageHandler.setDAOs(authDAO, gameDAO, userDAO);
+
         awaitInitialization();
         return port();
     }

@@ -161,12 +161,18 @@ public class PostLoginUI extends Repl {
 		app.setConnection(ws);
 		ws.connect();
 
+		// WebSocket Connects successfully, set GameID and Color
+		app.setGameID(gameId);
+		if (clientColor != null)
+			app.setColor(ChessGame.TeamColor.valueOf(clientColor.toUpperCase()));
+
 		String authToken = app.getAuthToken();
 		ws.setAuthToken(authToken);
 
-		Object join = (app.isPlaying()) ?
-			new JoinPlayer(gameId, ChessGame.TeamColor.valueOf(clientColor.toUpperCase()), authToken) :
-			new JoinObserver(gameId, authToken);
+		Object join = (app.getColor() != null) ?
+			new JoinPlayer(app.getGameID(), app.getColor(), authToken) :
+			new JoinObserver(app.getGameID(), authToken);
+
 		String message = gson.toJson(join);
 		ws.sendMessage(message);
 	}
@@ -176,7 +182,6 @@ public class PostLoginUI extends Repl {
 		requestBody.addProperty("gameID", gameId);
 		if (clientColor != null) {
 			requestBody.addProperty("playerColor", clientColor);
-			app.setPlaying(true);
 		}
 
 		sendPutRequest("/game", requestBody.toString(), (response) -> {

@@ -220,7 +220,7 @@ public class MySQLDatabase implements DataAccess {
 				"black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
 	}
 
-	public void updateGame(String username, int gameID, String clientColor) {
+	public void updateUserInGame(String username, int gameID, String clientColor) {
 		String columnToUpdate = ("white".equalsIgnoreCase(clientColor)) ? "whiteusername" : "blackusername";
 		String statement = "UPDATE games SET " + columnToUpdate + " = ? WHERE gameid = ?";
 
@@ -234,6 +234,21 @@ public class MySQLDatabase implements DataAccess {
 				// Handle case where the game ID does not exist or no rows were updated
 				System.out.println("No rows updated, check if the game ID exists.");
 			}
+		} catch (SQLException | DataAccessException e) {
+			System.out.println(e);
+			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
+		}
+	}
+
+	public void updateGame(int gameID, GameData game) {
+		String chessGameJSON = new Gson().toJson(game.getGame());
+		String statement = "UPDATE games SET chessgame = ? WHERE gameid = ?";
+
+		try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
+			ps.setString(1, chessGameJSON);
+			ps.setInt(2, gameID);
+
+			ps.executeUpdate();
 		} catch (SQLException | DataAccessException e) {
 			System.out.println(e);
 			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));

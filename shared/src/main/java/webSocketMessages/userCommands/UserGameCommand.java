@@ -28,11 +28,15 @@ public class UserGameCommand {
     private final String authToken;
 
     public String getAuthToken() {
-        return authToken;
+        return this.authToken;
     }
 
     public CommandType getCommandType() {
         return this.commandType;
+    }
+
+    public int getGameID() {
+        return this.gameID;
     }
 
     @Override

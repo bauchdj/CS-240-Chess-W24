@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import connection.WebSocketConnection;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.UserGameCommand;
@@ -62,20 +63,16 @@ public class GamePlayUI extends Repl {
 	private void leaveGame() {
 		WebSocketConnection ws = app.getConnection();
 		ws.close();
-		app.setPlaying(false);
+		app.setGameID(0);
+		app.setColor(null);
 
 		navigate();
 		app.navigateToPostLogin();
 	}
 
 	private void drawChessboard() {
-		// Draw the chessboard with black pieces at the bottom
-		drawChessboardOrientation(false);
-
-		System.out.println();
-
-		// Draw the chessboard with white pieces at the bottom
-		drawChessboardOrientation(true);
+		boolean whiteAtBottom = (app.getColor() != ChessGame.TeamColor.BLACK);
+		drawChessboardOrientation(whiteAtBottom);
 	}
 
 	private void drawChessboardOrientation(boolean whiteAtBottom) {
