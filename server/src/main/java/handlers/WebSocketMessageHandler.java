@@ -132,8 +132,11 @@ public class WebSocketMessageHandler {
 		if (teamColor == null) {
 			String username = authDAO.getAuth(new AuthData(makeMove.getAuthToken())).getUsername();
 
+			System.out.println(gameDAO.userIsPlayer(username, gameID));
+
 			// Observer not player...
 			if (!gameDAO.userIsPlayer(username, gameID)) {
+				System.out.println("hmmm...");
 				sendErrorMessage("Invalid username: " + username);
 				return;
 			}
@@ -221,6 +224,7 @@ public class WebSocketMessageHandler {
 
 		// Update the game in the database using gameDAO.updateGame(game)
 		gameDAO.removeUserFromGame(username, gameID);
+		gameDAO.removeGame(gameID);
 	}
 
 	private void sendNotification(int gameID, Notification notification) {

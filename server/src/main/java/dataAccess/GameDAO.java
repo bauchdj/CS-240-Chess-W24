@@ -90,4 +90,8 @@ public class GameDAO {
 	public boolean userIsPlayer(String username, int gameID) {
 		return userInGame(username, gameID, "white") || userInGame(username, gameID, "black");
 	}
+
+	public void removeGame(int gameID) {
+		this.database.removeGame(gameID);
+	}
 }

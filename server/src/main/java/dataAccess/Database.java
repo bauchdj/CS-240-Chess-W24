@@ -40,6 +40,10 @@ public class Database implements DataAccess {
 		return games.get(gameId);
 	}
 
+	public void removeGame(int gameID) {
+		games.remove(gameID);
+	}
+
 	public HashSet<GameData> listGames() {
 		return new HashSet<>(games.values());
 	}

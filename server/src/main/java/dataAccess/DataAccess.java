@@ -24,6 +24,8 @@ public interface DataAccess {
 
 	public GameData getGame(int gameId);
 
+	public void removeGame(int gameID);
+
 	public HashSet<GameData> listGames();
 
 	public boolean userInGame(String username, int gameID, String clientColor);

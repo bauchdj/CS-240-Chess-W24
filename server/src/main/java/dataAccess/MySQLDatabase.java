@@ -186,6 +186,20 @@ public class MySQLDatabase implements DataAccess {
 		return null;
 	}
 
+	@Override
+	public void removeGame(int gameID) {
+		String statement = "DELETE FROM games WHERE gameid = ?";
+
+		try (var conn = DatabaseManager.getConnection(); var ps = conn.prepareStatement(statement)) {
+			ps.setInt(1, gameID);
+
+			ps.executeUpdate();
+		} catch (SQLException | DataAccessException e) {
+			System.out.println(e);
+			//throw new ResponseException(500, String.format("Unable to configure database: %s", e.getMessage()));
+		}
+	}
+
 	public HashSet<GameData> listGames() {
 		try (var conn = DatabaseManager.getConnection()) {
 			HashSet<GameData> gameList = new HashSet<>();
