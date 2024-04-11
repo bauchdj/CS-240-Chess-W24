@@ -15,9 +15,9 @@ public class GamePlayUI extends Repl {
 		HELP(1, "Help"),
 		REDRAW_CHESS_BOARD(2, "Redraw Chess Board"),
 		MAKE_MOVE(3, "Make Move"),
-		RESIGN(4, "Resign"),
-		HIGHLIGHT_LEGAL_MOVES(5, "Highlight Legal Moves"),
-		LEAVE(6, "Leave");
+		HIGHLIGHT_LEGAL_MOVES(4, "Highlight Legal Moves"),
+		LEAVE(5, "Leave"),
+		RESIGN(6, "Resign");
 
 		private final int number;
 		private final String description;
@@ -75,9 +75,9 @@ public class GamePlayUI extends Repl {
 				case HELP -> displayHelp();
 				case REDRAW_CHESS_BOARD -> redrawChessboard();
 				case MAKE_MOVE -> makeMove();
-				case RESIGN -> resign();
 				case HIGHLIGHT_LEGAL_MOVES -> highlightLegalMoves();
 				case LEAVE -> leave();
+				case RESIGN -> resign();
 			}
 		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 			System.out.println("Invalid choice. Please try again.");
@@ -94,16 +94,16 @@ public class GamePlayUI extends Repl {
 		System.out.println("3. Make Move:");
 		System.out.println("   - Allows you to make a move by entering the source and destination coordinates.");
 		System.out.println("   - Example: To move a piece from e2 to e4, enter 'e2e4'.");
-		System.out.println("4. Resign:");
-		System.out.println("   - Allows you to resign from the game, forfeiting the match.");
-		System.out.println("   - You will be prompted to confirm your decision.");
-		System.out.println("5. Highlight Legal Moves:");
+		System.out.println("4. Highlight Legal Moves:");
 		System.out.println("   - Highlights the legal moves for a selected piece.");
 		System.out.println("   - Enter the coordinates of the piece (e.g., 'e2') to see its legal moves.");
 		System.out.println("   - This is a local operation and does not affect other players' views.");
-		System.out.println("6. Leave:");
+		System.out.println("5. Leave:");
 		System.out.println("   - Allows you to leave the game, whether you are playing or observing.");
 		System.out.println("   - You will be returned to the Post-Login UI.");
+		System.out.println("6. Resign:");
+		System.out.println("   - Allows you to resign from the game, forfeiting the match.");
+		System.out.println("   - You will be prompted to confirm your decision.");
 	}
 
 	public void handleLoadGame(LoadGame loadGame) {
@@ -122,8 +122,7 @@ public class GamePlayUI extends Repl {
 	private void makeMove() {
 		System.out.print("Enter your move (e.g., e2e4): ");
 		String move = scanner.nextLine();
-
-		// TODO: Implement the logic to make the move on the chessboard
+		
 		ChessPosition startPos = new ChessPosition(move.substring(0, 2));
 		ChessPosition endPos = new ChessPosition(move.substring(2));
 
@@ -135,6 +134,7 @@ public class GamePlayUI extends Repl {
 	private void highlightLegalMoves() {
 		System.out.print("Enter the coordinates of the piece (e.g., e2): ");
 		String coordinates = scanner.nextLine();
+
 		// TODO: Implement the logic to highlight legal moves for the selected piece
 		// This is a local operation and has no effect on remote users' screens
 
@@ -155,7 +155,6 @@ public class GamePlayUI extends Repl {
 		System.out.print("Are you sure you want to resign? (y/n): ");
 		String confirmation = scanner.nextLine();
 		if (confirmation.equalsIgnoreCase("y")) {
-			// TODO: Implement the logic to resign the game
 			System.out.println("You have resigned from the game.");
 
 			ws.sendMessage(gson.toJson(new Resign(app.getGameID(), app.getAuthToken())));

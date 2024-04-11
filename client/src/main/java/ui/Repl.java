@@ -37,7 +37,10 @@ public abstract class Repl { // Read-Eval-Print Loop
 
 			processInput(input);
 
-			if (shouldNavigate) break; // breaks the loop of UI
+			if (shouldNavigate) {  // breaks the loop of UI
+				shouldNavigate = false;
+				break;
+			}
 		}
 	}
 

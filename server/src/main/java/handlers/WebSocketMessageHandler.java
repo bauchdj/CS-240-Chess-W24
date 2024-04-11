@@ -156,8 +156,10 @@ public class WebSocketMessageHandler {
 		} catch (InvalidMoveException e) {
 			// If the move is invalid:
 			//   - Send Error message to the root client
-			System.out.println("Error here sadly... " + move);
-			sendErrorMessage("Invalid move: " + move);
+			String str = (game.getBoard().getPiece(move.getStartPosition()).getTeamColor() != teamTurn) ?
+				", your trying to move the other team's piece silly" :
+				", you can't move there...";
+			sendErrorMessage("Invalid move: " + move + str);
 			return;
 		}
 
