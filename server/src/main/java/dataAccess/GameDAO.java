@@ -63,6 +63,11 @@ public class GameDAO {
 		this.database.updateUserInGame(username, gameId, clientColor);
 	}
 
+	public void removeUserFromGame(String username, int gameID) {
+		String clientColor = (userExists(username, gameID, "white")) ? "white" : "black";
+		updateUserInGame(username, gameID, clientColor);
+	}
+
 	public void updateGame(int gameID, GameData game) {
 		this.database.updateGame(gameID, game);
 	}

@@ -118,26 +118,41 @@ public class WebSocketMessageHandler {
 	}
 
 	private void handleMakeMove(MakeMove makeMove) {
-		// Handle make move logic
-		// Verify the validity of the move
-		// Update the game state and database
-		// Send LOAD_GAME message to all clients
-		// Send Notification message to all other clients
+		// Retrieve the game from the database using gameDAO.getGame(makeMove.getGameId())
+		// Verify the validity of the move using game.isValidMove(makeMove.getMove())
+		// If the move is valid:
+		//   - Update the game state using game.makeMove(makeMove.getMove())
+		//   - Check if the game is in check, checkmate, or stalemate
+		//   - Update the game in the database using gameDAO.updateGame(game)
+		//   - Send LOAD_GAME message to all clients in the game
+		//   - Broadcast Notification message to all other clients in the game
+		// If the move is invalid:
+		//   - Send Error message to the root client
 	}
 
 	private void handleLeave(Leave leave) {
-		// Handle leave logic
-		// Update the game state and database if a player is leaving
-		// Send Notification message to all other clients
+		// Retrieve the game from the database using gameDAO.getGame(leave.getGameId())
+		// Retrieve the user information from the database using userDAO.getUser(leave.getAuthToken())
+		// If the user is a player:
+		//   - Update the game state to remove the player (game.removePlayer(user))
+		//   - Update the game in the database using gameDAO.updateGame(game)
+		// If the user is an observer:
+		//   - Update the game state to remove the observer (game.removeObserver(user))
+		// Broadcast Notification message to all other clients in the game
 	}
 
 	private void handleResign(Resign resign) {
-		int gameID = resign.getGameID();;
+		int gameID = resign.getGameID();
 
 		removeSession(gameID, session);
 
-		// Mark the game as over and update the database
-		// Send Notification message to all clients
+		// Update the game in the database using gameDAO.updateGame(game)
+		String username = authDAO.getAuth(new AuthData(resign.getAuthToken())).getUsername();
+		gameDAO.removeUserFromGame(username, gameID);
+
+		// Broadcast Notification message to all clients in the game
+		Notification notification = new Notification("Resignation! User: " + username);
+		sendNotification(gameID, gson.toJson(notification));
 	}
 
 	private void sendNotification(int gameID, String message) {
