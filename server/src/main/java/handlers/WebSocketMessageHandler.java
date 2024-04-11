@@ -70,18 +70,34 @@ public class WebSocketMessageHandler {
 	private void handleJoinPlayer(JoinPlayer joinPlayer) {
 		int gameID = joinPlayer.getGameID();
 		GameData gameData = gameDAO.getGame(gameID);
-		ChessGame game = gameData.getGame();
 
-		// Send LOAD_GAME message to the root client
-		LoadGame loadGame = new LoadGame(game);
-		sendMessage(gson.toJson(loadGame));
-
-		addSession(gameID, session);
-
-		// Send Notification message to all other clients
 		String username = authDAO.getAuth(new AuthData(joinPlayer.getAuthToken())).getUsername();
-		Notification notification = new Notification("New Join! User: " + username + ", Color: " + joinPlayer.getPlayerColor());
-		sendNotification(gameID, gson.toJson(notification));
+
+		if ((joinPlayer.getPlayerColor() == ChessGame.TeamColor.WHITE &&
+				gameData.getWhiteUsername() != null &&
+				gameData.getWhiteUsername().equals(username)) ||
+			joinPlayer.getPlayerColor() == ChessGame.TeamColor.BLACK &&
+				gameData.getBlackUsername() != null &&
+				gameData.getBlackUsername().equals(username)) {
+
+			ChessGame game = gameData.getGame();
+
+			// Send LOAD_GAME message to the root client
+			LoadGame loadGame = new LoadGame(game);
+			sendMessage(gson.toJson(loadGame));
+
+			addSession(gameID, session);
+
+			// Send Notification message to all other clients
+			Notification notification = new Notification("New Join! User: " + username + ", Color: " + joinPlayer.getPlayerColor());
+			sendNotification(gameID, gson.toJson(notification));
+		} else {
+			if ((joinPlayer.getPlayerColor() == ChessGame.TeamColor.WHITE && gameData.getWhiteUsername() != null) ||
+				joinPlayer.getPlayerColor() == ChessGame.TeamColor.BLACK && gameData.getBlackUsername() != null)
+					sendErrorMessage("Color already in use, GameID: " + gameID);
+			else
+				sendErrorMessage("Prior HTTP join request DNE, GameID: " + gameID);
+		}
 	}
 
 	private void handleJoinObserver(JoinObserver joinObserver) {
@@ -124,10 +140,6 @@ public class WebSocketMessageHandler {
 		// Send Notification message to all clients
 	}
 
-	private void sendErrorMessage(String errorMessage) {
-		sendMessage("Error: " + errorMessage);
-	}
-
 	private void sendNotification(int gameID, String message) {
 		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
 		for (Session session : setSessions) {
@@ -135,6 +147,11 @@ public class WebSocketMessageHandler {
 				sendMessage(session, message);
 			}
 		}
+	}
+
+	private void sendErrorMessage(String errorMessage) {
+		ServerMessageError serverMessageError = new ServerMessageError(errorMessage);
+		sendMessage(gson.toJson(serverMessageError));
 	}
 
 	private void sendMessage(String message) {

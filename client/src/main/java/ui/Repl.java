@@ -17,6 +17,8 @@ public abstract class Repl { // Read-Eval-Print Loop
 		String quit = "quit";
 		String help = "help";
 
+		onStart();
+
 		while (true) {
 			displayPrompt();
 			System.out.println("Type '" + quit + "' to exit");
@@ -38,6 +40,8 @@ public abstract class Repl { // Read-Eval-Print Loop
 			if (shouldNavigate) break; // breaks the loop of UI
 		}
 	}
+
+	protected abstract void onStart();
 
 	protected abstract void displayPrompt();
 

@@ -34,6 +34,9 @@ public class PreLoginUI extends Repl {
 	}
 
 	@Override
+	protected  void onStart() { return; }
+
+	@Override
 	protected void displayPrompt() {
 		for (MenuOption option : MenuOption.values()) {
 			System.out.println(option.getNumber() + ". " + option.getDescription());

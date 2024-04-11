@@ -45,6 +45,9 @@ public class PostLoginUI extends Repl {
 	}
 
 	@Override
+	protected  void onStart() { return; }
+
+	@Override
 	protected void displayPrompt() {
 		System.out.println("Welcome! Let's Play Chess. Woohoo ;)");
 		for (MenuOption option : MenuOption.values()) {
@@ -156,42 +159,23 @@ public class PostLoginUI extends Repl {
 		return -1;
 	}
 
-	private void connectWS(int gameId, String clientColor) {
-		WebSocketConnection ws = new WebSocketConnection();
-		app.setConnection(ws);
-		ws.connect();
-
-		// WebSocket Connects successfully, set GameID and Color
-		app.setGameID(gameId);
-		if (clientColor != null)
-			app.setColor(ChessGame.TeamColor.valueOf(clientColor.toUpperCase()));
-
-		String authToken = app.getAuthToken();
-		ws.setAuthToken(authToken);
-
-		Object join = (app.getColor() != null) ?
-			new JoinPlayer(app.getGameID(), app.getColor(), authToken) :
-			new JoinObserver(app.getGameID(), authToken);
-
-		String message = gson.toJson(join);
-		ws.sendMessage(message);
-	}
-
-	private void sendPutGameRequest(int gameId, String clientColor) {
+	private void sendPutGameRequest(int gameID, String clientColor) {
 		JsonObject requestBody = new JsonObject();
-		requestBody.addProperty("gameID", gameId);
+		requestBody.addProperty("gameID", gameID);
+		app.setGameID(gameID);
+
 		if (clientColor != null) {
 			requestBody.addProperty("playerColor", clientColor);
+			app.setColor(ChessGame.TeamColor.valueOf(clientColor.toUpperCase()));
 		}
 
 		sendPutRequest("/game", requestBody.toString(), (response) -> {
 			System.out.println("Join / Observe game successful!");
-
-			connectWS(gameId, clientColor);
-
 			navigate();
 			app.navigateToGamePlay();
 		}, () -> {
+			app.setGameID(0);
+			app.setColor(null);
 			System.out.println("Request failed. Please try again.");
 		});
 	}

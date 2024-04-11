@@ -1,5 +1,6 @@
 package connection;
 
+import ui.GamePlayUI;
 import webSocketMessages.serverMessages.*;
 
 import com.google.gson.Gson;
@@ -11,8 +12,14 @@ import java.net.URI;
 public class WebSocketConnection {
 	private static final Gson gson = new Gson();
 	private static URI baseUri;
-	private Session session;
 	private String authToken = null;
+	private GamePlayUI gamePlayUI = null;
+	private Session session = null;
+
+	public WebSocketConnection(GamePlayUI gamePlayUI, String authToken) {
+		this.authToken = authToken;
+		this.gamePlayUI = gamePlayUI;
+	}
 
 	public static void setBaseUri(String host, int port, String path) {
 		try {
@@ -84,32 +91,17 @@ public class WebSocketConnection {
 
 		switch (serverMessage.getServerMessageType()) {
 			case LOAD_GAME:
-				handleLoadGame(gson.fromJson(message, LoadGame.class));
+				gamePlayUI.handleLoadGame(gson.fromJson(message, LoadGame.class));
 				break;
 			case ERROR:
-				handleError(gson.fromJson(message, ServerMessageError.class));
+				gamePlayUI.handleError(gson.fromJson(message, ServerMessageError.class));
 				break;
 			case NOTIFICATION:
-				handleNotification(gson.fromJson(message, Notification.class));
+				gamePlayUI.handleNotification(gson.fromJson(message, Notification.class));
 				break;
 			default:
 				// Handle unknown message type
 				System.out.println("Unknown message type! Yikes!");
 		}
-	}
-
-	private void handleLoadGame(LoadGame loadGame) {
-		// Handle load game logic
-		// Update the game state on the client-side
-	}
-
-	private void handleError(ServerMessageError error) {
-		// Handle error logic
-		// Display the error message to the user
-	}
-
-	private void handleNotification(Notification notification) {
-		// Handle notification logic
-		// Display the notification message to the user based on the event type
 	}
 }

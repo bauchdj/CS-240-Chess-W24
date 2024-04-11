@@ -2,12 +2,20 @@ package ui;
 
 import chess.ChessGame;
 import connection.WebSocketConnection;
-import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessageError;
+import webSocketMessages.userCommands.JoinObserver;
+import webSocketMessages.userCommands.JoinPlayer;
 
 public class GamePlayUI extends Repl {
 	private enum MenuOption {
-		LEAVE_GAME(1, "Leave Game");
+		HELP(1, "Help"),
+		REDRAW_CHESS_BOARD(2, "Redraw Chess Board"),
+		MAKE_MOVE(3, "Make Move"),
+		RESIGN(4, "Resign"),
+		HIGHLIGHT_LEGAL_MOVES(5, "Highlight Legal Moves"),
+		LEAVE(6, "Leave");
 
 		private final int number;
 		private final String description;
@@ -25,8 +33,26 @@ public class GamePlayUI extends Repl {
 			return description;
 		}
 	}
+
 	public GamePlayUI(App app) {
 		super(app);
+	}
+
+	@Override
+	protected void onStart() {
+		String authToken = app.getAuthToken();
+		WebSocketConnection ws = new WebSocketConnection(this, authToken);
+		app.setConnection(ws);
+		ws.connect();
+
+		Object join = (app.getColor() != null) ?
+			new JoinPlayer(app.getGameID(), app.getColor(), authToken) :
+			new JoinObserver(app.getGameID(), authToken);
+
+		String message = gson.toJson(join);
+		ws.sendMessage(message);
+
+		System.out.println("On Start only running once... RIGHT!!!");
 	}
 
 	@Override
@@ -44,7 +70,12 @@ public class GamePlayUI extends Repl {
 			int choice = Integer.parseInt(input);
 			GamePlayUI.MenuOption selectedOption = GamePlayUI.MenuOption.values()[choice - 1];
 			switch (selectedOption) {
-				case LEAVE_GAME -> leaveGame();
+				case HELP -> displayHelp();
+				case REDRAW_CHESS_BOARD -> redrawChessboard();
+				case MAKE_MOVE -> makeMove();
+				case RESIGN -> resign();
+				case HIGHLIGHT_LEGAL_MOVES -> highlightLegalMoves();
+				case LEAVE -> leave();
 			}
 		} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 			System.out.println("Invalid choice. Please try again.");
@@ -54,13 +85,66 @@ public class GamePlayUI extends Repl {
 	@Override
 	protected void displayHelp() {
 		System.out.println("Gameplay Help:");
-		System.out.println("- The chessboard is displayed in two orientations.");
-		System.out.println("- White pieces are shown at the bottom in the first orientation.");
-		System.out.println("- Black pieces are shown at the bottom in the second orientation.");
-		System.out.println("- Gameplay functionality will be implemented later.");
+		System.out.println("1. Help:");
+		System.out.println("   - Displays this help menu, providing information about the available actions.");
+		System.out.println("2. Redraw Chess Board:");
+		System.out.println("   - Redraws the chessboard, updating its current state.");
+		System.out.println("3. Make Move:");
+		System.out.println("   - Allows you to make a move by entering the source and destination coordinates.");
+		System.out.println("   - Example: To move a piece from e2 to e4, enter 'e2e4'.");
+		System.out.println("4. Resign:");
+		System.out.println("   - Allows you to resign from the game, forfeiting the match.");
+		System.out.println("   - You will be prompted to confirm your decision.");
+		System.out.println("5. Highlight Legal Moves:");
+		System.out.println("   - Highlights the legal moves for a selected piece.");
+		System.out.println("   - Enter the coordinates of the piece (e.g., 'e2') to see its legal moves.");
+		System.out.println("   - This is a local operation and does not affect other players' views.");
+		System.out.println("6. Leave:");
+		System.out.println("   - Allows you to leave the game, whether you are playing or observing.");
+		System.out.println("   - You will be returned to the Post-Login UI.");
 	}
 
-	private void leaveGame() {
+	public void handleLoadGame(LoadGame loadGame) {
+		// Handle load game logic
+		// Update the game state on the client-side
+	}
+
+	public void handleError(ServerMessageError error) {
+		// Handle error logic
+		// Display the error message to the user
+	}
+
+	public void handleNotification(Notification notification) {
+		// Handle notification logic
+		// Display the notification message to the user based on the event type
+	}
+
+	private void makeMove() {
+		System.out.print("Enter your move (e.g., e2e4): ");
+		String move = scanner.nextLine();
+		// TODO: Implement the logic to make the move on the chessboard
+		// Update the chessboard on all clients involved in the game
+	}
+
+	private void resign() {
+		System.out.print("Are you sure you want to resign? (y/n): ");
+		String confirmation = scanner.nextLine();
+		if (confirmation.equalsIgnoreCase("y")) {
+			// TODO: Implement the logic to resign the game
+			System.out.println("You have resigned from the game.");
+		}
+	}
+
+	private void highlightLegalMoves() {
+		System.out.print("Enter the coordinates of the piece (e.g., e2): ");
+		String coordinates = scanner.nextLine();
+		// TODO: Implement the logic to highlight legal moves for the selected piece
+		// This is a local operation and has no effect on remote users' screens
+	}
+
+	private void redrawChessboard() { return; }
+
+	private void leave() {
 		WebSocketConnection ws = app.getConnection();
 		ws.close();
 		app.setGameID(0);
