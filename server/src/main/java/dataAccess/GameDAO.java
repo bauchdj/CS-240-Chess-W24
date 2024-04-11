@@ -1,5 +1,6 @@
 package dataAccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.HashSet;
@@ -48,8 +49,12 @@ public class GameDAO {
 		return database.listGames();
 	}
 
-	public boolean userExists(String username, int gameId, String clientColor) {
+	public boolean userInGame(String username, int gameId, String clientColor) {
 		return this.database.userInGame(username, gameId, clientColor);
+	}
+
+	public boolean userExists(int gameId, String clientColor) {
+		return this.database.userExists(gameId, clientColor);
 	}
 
 	/**
@@ -63,12 +68,26 @@ public class GameDAO {
 		this.database.updateUserInGame(username, gameId, clientColor);
 	}
 
-	public void removeUserFromGame(String username, int gameID) {
-		String clientColor = (userExists(username, gameID, "white")) ? "white" : "black";
-		updateUserInGame(username, gameID, clientColor);
-	}
-
+	/**
+	 * Updates the game data for a given game ID.
+	 *
+	 * @param gameID The ID of the game to be updated.
+	 * @param game The game data to be inserted.
+	 */
 	public void updateGame(int gameID, GameData game) {
 		this.database.updateGame(gameID, game);
+	}
+
+	public void removeUserFromGame(String username, int gameID) {
+		String clientColor = (userInGame(username, gameID, "white")) ? "white" : "black";
+		updateUserInGame(null, gameID, clientColor);
+	}
+
+	public ChessGame.TeamColor getUserColorInGame(String username, int gameID) {
+		return (userInGame(username, gameID, "white")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+	}
+
+	public boolean userIsPlayer(String username, int gameID) {
+		return userInGame(username, gameID, "white") || userInGame(username, gameID, "black");
 	}
 }

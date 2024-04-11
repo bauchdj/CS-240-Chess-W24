@@ -47,8 +47,15 @@ public class Database implements DataAccess {
 	public boolean userInGame(String username, int gameID, String clientColor) {
 		GameData game = getGame(gameID);
 		return game != null &&
-				(("white".equalsIgnoreCase(clientColor) && game.getWhiteUsername() != null) ||
-				 "black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
+				(("white".equalsIgnoreCase(clientColor) && game.getWhiteUsername() != null && game.getWhiteUsername().equals(username)) ||
+				 "black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null && game.getBlackUsername().equals(username));
+	}
+
+	public boolean userExists(int gameID, String clientColor) {
+		GameData game = getGame(gameID);
+		return game != null &&
+			(("white".equalsIgnoreCase(clientColor) && game.getWhiteUsername() != null) ||
+				"black".equalsIgnoreCase(clientColor) && game.getBlackUsername() != null);
 	}
 
 	public void updateUserInGame(String username, int gameID, String clientColor) {

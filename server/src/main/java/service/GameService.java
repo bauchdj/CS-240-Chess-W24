@@ -45,7 +45,7 @@ public class GameService {
 		String username = dbAuthData.getUsername();
 
 		if (clientColor != null) {
-			if (this.gameDAO.userExists(username, gameID, clientColor)) return "already taken";
+			if (this.gameDAO.userExists(gameID, clientColor)) return "already taken";
 			this.gameDAO.updateUserInGame(username, gameID, clientColor);
 		}
 

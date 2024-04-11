@@ -1,6 +1,8 @@
 package handlers;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataAccess.*;
 import model.*;
 import webSocketMessages.serverMessages.*;
@@ -76,9 +78,9 @@ public class WebSocketMessageHandler {
 		if ((joinPlayer.getPlayerColor() == ChessGame.TeamColor.WHITE &&
 				gameData.getWhiteUsername() != null &&
 				gameData.getWhiteUsername().equals(username)) ||
-			joinPlayer.getPlayerColor() == ChessGame.TeamColor.BLACK &&
+			(joinPlayer.getPlayerColor() == ChessGame.TeamColor.BLACK &&
 				gameData.getBlackUsername() != null &&
-				gameData.getBlackUsername().equals(username)) {
+				gameData.getBlackUsername().equals(username))) {
 
 			ChessGame game = gameData.getGame();
 
@@ -90,7 +92,7 @@ public class WebSocketMessageHandler {
 
 			// Send Notification message to all other clients
 			Notification notification = new Notification("New Join! User: " + username + ", Color: " + joinPlayer.getPlayerColor());
-			sendNotification(gameID, gson.toJson(notification));
+			sendNotification(gameID, notification);
 		} else {
 			if ((joinPlayer.getPlayerColor() == ChessGame.TeamColor.WHITE && gameData.getWhiteUsername() != null) ||
 				joinPlayer.getPlayerColor() == ChessGame.TeamColor.BLACK && gameData.getBlackUsername() != null)
@@ -114,20 +116,65 @@ public class WebSocketMessageHandler {
 		// Send Notification message to all other clients
 		String username = authDAO.getAuth(new AuthData(joinObserver.getAuthToken())).getUsername();
 		Notification notification = new Notification("New Observer! User: " + username);
-		sendNotification(gameID, gson.toJson(notification));
+		sendNotification(gameID, notification);
 	}
 
 	private void handleMakeMove(MakeMove makeMove) {
+		int gameID = makeMove.getGameID();
+		ChessMove move = makeMove.getMove();
+
 		// Retrieve the game from the database using gameDAO.getGame(makeMove.getGameId())
-		// Verify the validity of the move using game.isValidMove(makeMove.getMove())
-		// If the move is valid:
-		//   - Update the game state using game.makeMove(makeMove.getMove())
+		GameData gameData = gameDAO.getGame(gameID);
+		ChessGame game = gameData.getGame();
+
+		ChessGame.TeamColor teamColor = makeMove.getPlayerColor();
+		// Tests don't send teamColor :(
+		if (teamColor == null) {
+			String username = authDAO.getAuth(new AuthData(makeMove.getAuthToken())).getUsername();
+
+			// Observer not player...
+			if (!gameDAO.userIsPlayer(username, gameID)) {
+				sendErrorMessage("Invalid username: " + username);
+				return;
+			}
+
+			teamColor = gameDAO.getUserColorInGame(username, gameID);
+		}
+
+		ChessGame.TeamColor teamTurn = game.getTeamTurn();
+
+		// If you color doesn't match turn color, not your turn
+		if (teamColor != teamTurn) {
+			sendErrorMessage("Invalid: not your turn. Current turn: " + teamTurn);
+			return;
+		}
+
+		try {
+			// Verify the validity of the move using game.isValidMove(makeMove.getMove())
+			//   - Update the game state using game.makeMove(makeMove.getMove())
+			game.makeMove(move);
+		} catch (InvalidMoveException e) {
+			// If the move is invalid:
+			//   - Send Error message to the root client
+			System.out.println("Error here sadly... " + move);
+			sendErrorMessage("Invalid move: " + move);
+			return;
+		}
+
 		//   - Check if the game is in check, checkmate, or stalemate
+		game.isInCheck(teamTurn);
+		game.isInCheckmate(teamTurn);
+		game.isInStalemate(teamTurn);
+
 		//   - Update the game in the database using gameDAO.updateGame(game)
+		gameDAO.updateGame(gameID, new GameData(gameID, gameData.getGameName(), game));
+
 		//   - Send LOAD_GAME message to all clients in the game
+		sendLoadGameAll(gameID, game);
+
 		//   - Broadcast Notification message to all other clients in the game
-		// If the move is invalid:
-		//   - Send Error message to the root client
+		Notification notification = new Notification("Move: " + move);
+		sendNotification(gameID, notification);
 	}
 
 	private void handleLeave(Leave leave) {
@@ -139,28 +186,68 @@ public class WebSocketMessageHandler {
 		// If the user is an observer:
 		//   - Update the game state to remove the observer (game.removeObserver(user))
 		// Broadcast Notification message to all other clients in the game
+
+		int gameID = leave.getGameID();
+
+		removeSession(gameID, session);
+
+		// Update the game in the database using gameDAO.updateGame(game)
+		String username = authDAO.getAuth(new AuthData(leave.getAuthToken())).getUsername();
+		gameDAO.removeUserFromGame(username, gameID);
+
+		// Broadcast Notification message to all clients in the game
+		Notification notification = new Notification("Leaving! User: " + username);
+		sendNotificationAll(gameID, notification);
 	}
 
 	private void handleResign(Resign resign) {
 		int gameID = resign.getGameID();
 
+		// Broadcast Notification message to all clients in the game
+		String username = authDAO.getAuth(new AuthData(resign.getAuthToken())).getUsername();
+
+		// Observer not player...
+		if (!gameDAO.userIsPlayer(username, gameID)) {
+			sendErrorMessage("Invalid username: " + username);
+			return;
+		}
+
+		Notification notification = new Notification("Resignation! User: " + username);
+		sendNotificationAll(gameID, notification);
+
 		removeSession(gameID, session);
 
 		// Update the game in the database using gameDAO.updateGame(game)
-		String username = authDAO.getAuth(new AuthData(resign.getAuthToken())).getUsername();
 		gameDAO.removeUserFromGame(username, gameID);
-
-		// Broadcast Notification message to all clients in the game
-		Notification notification = new Notification("Resignation! User: " + username);
-		sendNotification(gameID, gson.toJson(notification));
 	}
 
-	private void sendNotification(int gameID, String message) {
+	private void sendNotification(int gameID, Notification notification) {
+		String message = gson.toJson(notification);
+
 		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
 		for (Session session : setSessions) {
 			if (this.session != session) {
 				sendMessage(session, message);
 			}
+		}
+	}
+
+	private void sendNotificationAll(int gameID, Notification notification) {
+		String message = gson.toJson(notification);
+
+		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
+		for (Session session : setSessions) {
+				sendMessage(session, message);
+		}
+	}
+
+	private void sendLoadGameAll(int gameID, ChessGame game) {
+		LoadGame loadGame = new LoadGame(game);
+		String message = gson.toJson(loadGame);
+
+		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
+		for (Session session : setSessions) {
+			sendMessage(session, message);
 		}
 	}
 

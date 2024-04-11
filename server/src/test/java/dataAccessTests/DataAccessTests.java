@@ -221,14 +221,14 @@ public class DataAccessTests {
 		GameData gameData = new GameData(1, "test", new ChessGame());
 		gameDAO.createGame(gameData);
 		gameDAO.updateUserInGame("bob", 1, "white");
-		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
+		Assertions.assertTrue(gameDAO.userExists(1, "white"));
 	}
 
 	@Test
 	@Order(22)
 	@DisplayName("Non-existent User in Games")
 	public void failGameDataUserExists() throws TestException {
-		Assertions.assertFalse(gameDAO.userExists("bob", 1, "white"));
+		Assertions.assertFalse(gameDAO.userExists(1, "white"));
 	}
 
 	@Test
@@ -238,7 +238,7 @@ public class DataAccessTests {
 		GameData gameData = new GameData(1, "test", new ChessGame());
 		gameDAO.createGame(gameData);
 		gameDAO.updateUserInGame("bob", 1, "white");
-		Assertions.assertTrue(gameDAO.userExists("bob", 1, "white"));
+		Assertions.assertTrue(gameDAO.userExists(1, "white"));
 	}
 
 	@Test
@@ -246,7 +246,7 @@ public class DataAccessTests {
 	@DisplayName("Non-existent Game, Fail to Update")
 	public void failUpdateGame() throws TestException {
 		gameDAO.updateUserInGame("bob", 1, "white");
-		Assertions.assertFalse(gameDAO.userExists("bob", 1, "white"));
+		Assertions.assertFalse(gameDAO.userExists(1, "white"));
 	}
 
 	@Test
