@@ -1,4 +1,4 @@
-package messages;
+package webSocketMessages.userCommands;
 
 import webSocketMessages.userCommands.UserGameCommand;
 

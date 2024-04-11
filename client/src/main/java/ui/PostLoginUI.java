@@ -4,8 +4,8 @@ import static connection.HttpConnection.*;
 import static ui.UserInputHandler.*;
 
 import chess.ChessGame;
-import messages.JoinPlayer;
-import messages.JoinObserver;
+import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.JoinObserver;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

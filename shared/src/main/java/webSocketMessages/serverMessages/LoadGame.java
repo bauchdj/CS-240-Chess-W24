@@ -1,4 +1,4 @@
-package messages;
+package webSocketMessages.serverMessages;
 
 import chess.ChessGame;
 import webSocketMessages.serverMessages.ServerMessage;
