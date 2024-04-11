@@ -127,11 +127,11 @@ public class WebSocketMessageHandler {
 		GameData gameData = gameDAO.getGame(gameID);
 		ChessGame game = gameData.getGame();
 
+		String username = authDAO.getAuth(new AuthData(makeMove.getAuthToken())).getUsername();
+
 		ChessGame.TeamColor teamColor = makeMove.getPlayerColor();
 		// Tests don't send teamColor :(
 		if (teamColor == null) {
-			String username = authDAO.getAuth(new AuthData(makeMove.getAuthToken())).getUsername();
-
 			System.out.println(gameDAO.userIsPlayer(username, gameID));
 
 			// Observer not player...
@@ -166,11 +166,6 @@ public class WebSocketMessageHandler {
 			return;
 		}
 
-		//   - Check if the game is in check, checkmate, or stalemate
-		game.isInCheck(teamTurn);
-		game.isInCheckmate(teamTurn);
-		game.isInStalemate(teamTurn);
-
 		//   - Update the game in the database using gameDAO.updateGame(game)
 		gameDAO.updateGame(gameID, new GameData(gameID, gameData.getGameName(), game));
 
@@ -180,6 +175,26 @@ public class WebSocketMessageHandler {
 		//   - Broadcast Notification message to all other clients in the game
 		Notification notification = new Notification("Move: " + move);
 		sendNotification(gameID, notification);
+
+		sendCheckCheckMateStaleMateMessages(game, teamTurn, username, teamColor, gameID);
+		sendCheckCheckMateStaleMateMessages(game, teamTurn, username, (teamColor == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE), gameID);
+	}
+
+	private void sendCheckCheckMateStaleMateMessages(ChessGame game, ChessGame.TeamColor teamTurn, String username, ChessGame.TeamColor teamColor, int gameID) {
+		boolean isInCheck = game.isInCheck(teamTurn);
+		boolean isInCheckmate = game.isInCheckmate(teamTurn);
+		boolean isInStalemate = game.isInStalemate(teamTurn);
+		if (isInCheckmate || isInStalemate) {
+			Notification notification = new Notification("Game Over: " +
+				"isInCheckmate: " + isInCheckmate +
+				", isInStalemate: " + isInStalemate);
+
+			sendNotificationAll(gameID, notification);
+
+			removeGameAndSession(gameID, username, session);
+		} else if (isInCheck) {
+			sendNotificationAll(gameID, new Notification("InCheck user: " + username + ", color: " + teamColor));
+		}
 	}
 
 	private void handleLeave(Leave leave) {
@@ -198,7 +213,8 @@ public class WebSocketMessageHandler {
 
 		// Update the game in the database using gameDAO.updateGame(game)
 		String username = authDAO.getAuth(new AuthData(leave.getAuthToken())).getUsername();
-		gameDAO.removeUserFromGame(username, gameID);
+		if (gameDAO.gameExist(gameID))
+			gameDAO.removeUserFromGame(username, gameID);
 
 		// Broadcast Notification message to all clients in the game
 		Notification notification = new Notification("Leaving! User: " + username);
@@ -220,11 +236,17 @@ public class WebSocketMessageHandler {
 		Notification notification = new Notification("Resignation! User: " + username);
 		sendNotificationAll(gameID, notification);
 
+		removeGameAndSession(gameID, username, session);
+	}
+
+	private void removeGameAndSession(int gameID, String username, Session session) {
 		removeSession(gameID, session);
 
 		// Update the game in the database using gameDAO.updateGame(game)
-		gameDAO.removeUserFromGame(username, gameID);
-		gameDAO.removeGame(gameID);
+		if (gameDAO.gameExist(gameID)) {
+			gameDAO.removeUserFromGame(username, gameID);
+			gameDAO.removeGame(gameID);
+		}
 	}
 
 	private void sendNotification(int gameID, Notification notification) {

@@ -119,6 +119,17 @@ public class GamePlayUI extends Repl {
 
 	public void handleNotification(Notification notification) {
 		System.out.println(notification.getMessage());
+
+		String message = notification.getMessage();
+		if (message.contains("Game Over")) {
+			if (message.contains("Checkmate: true")) {
+				System.out.println("In Checkmate!!!");
+			} else if (message.contains("Stalemate: true")) {
+				System.out.println("In Stalemate!!!");
+			}
+
+			System.out.println("You can now leave or resign from the game.");
+		}
 	}
 
 	private void makeMove() {
