@@ -17,6 +17,13 @@ public class ChessPosition {
         this.col = col;
     }
 
+    public ChessPosition(String notation) {
+        // a2 would be col 1, row 2
+        char colChar = notation.charAt(0);
+        col = colChar - 'a' + 1;
+        row = Character.getNumericValue(notation.charAt(1));
+    }
+
     /**
      * @return which row this position is in
      * 1 codes for the bottom row

@@ -1,14 +1,16 @@
 package ui;
 
-import chess.ChessGame;
+import chess.*;
 import connection.WebSocketConnection;
-import webSocketMessages.serverMessages.LoadGame;
-import webSocketMessages.serverMessages.Notification;
-import webSocketMessages.serverMessages.ServerMessageError;
-import webSocketMessages.userCommands.JoinObserver;
-import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.serverMessages.*;
+import webSocketMessages.userCommands.*;
+
+import java.util.Collection;
 
 public class GamePlayUI extends Repl {
+	private WebSocketConnection ws;
+	private ChessGame game;
+
 	private enum MenuOption {
 		HELP(1, "Help"),
 		REDRAW_CHESS_BOARD(2, "Redraw Chess Board"),
@@ -41,7 +43,7 @@ public class GamePlayUI extends Repl {
 	@Override
 	protected void onStart() {
 		String authToken = app.getAuthToken();
-		WebSocketConnection ws = new WebSocketConnection(this, authToken);
+		ws = new WebSocketConnection(this, authToken);
 		app.setConnection(ws);
 		ws.connect();
 
@@ -58,7 +60,7 @@ public class GamePlayUI extends Repl {
 	@Override
 	protected void displayPrompt() {
 		System.out.println("Chessboard:");
-		drawChessboard();
+		if (game != null) drawChessboard();
 		for (GamePlayUI.MenuOption option : GamePlayUI.MenuOption.values()) {
 			System.out.println(option.getNumber() + ". " + option.getDescription());
 		}
@@ -105,34 +107,29 @@ public class GamePlayUI extends Repl {
 	}
 
 	public void handleLoadGame(LoadGame loadGame) {
-		// Handle load game logic
-		// Update the game state on the client-side
+		game = loadGame.getGame();
+		System.out.println("ChessBoard loaded. Redraw Chessboard by entering 2");
 	}
 
 	public void handleError(ServerMessageError error) {
-		// Handle error logic
-		// Display the error message to the user
+		System.out.println(error.getErrorMessage());
 	}
 
 	public void handleNotification(Notification notification) {
-		// Handle notification logic
-		// Display the notification message to the user based on the event type
+		System.out.println(notification.getMessage());
 	}
 
 	private void makeMove() {
 		System.out.print("Enter your move (e.g., e2e4): ");
 		String move = scanner.nextLine();
-		// TODO: Implement the logic to make the move on the chessboard
-		// Update the chessboard on all clients involved in the game
-	}
 
-	private void resign() {
-		System.out.print("Are you sure you want to resign? (y/n): ");
-		String confirmation = scanner.nextLine();
-		if (confirmation.equalsIgnoreCase("y")) {
-			// TODO: Implement the logic to resign the game
-			System.out.println("You have resigned from the game.");
-		}
+		// TODO: Implement the logic to make the move on the chessboard
+		ChessPosition startPos = new ChessPosition(move.substring(0, 2));
+		ChessPosition endPos = new ChessPosition(move.substring(2));
+
+		ChessMove chessMove = new ChessMove(startPos, endPos, null);
+		MakeMove makeMove = new MakeMove(app.getGameID(), chessMove, app.getAuthToken());
+		ws.sendMessage(gson.toJson(makeMove));
 	}
 
 	private void highlightLegalMoves() {
@@ -140,33 +137,53 @@ public class GamePlayUI extends Repl {
 		String coordinates = scanner.nextLine();
 		// TODO: Implement the logic to highlight legal moves for the selected piece
 		// This is a local operation and has no effect on remote users' screens
+
+		ChessPosition position = new ChessPosition(coordinates);
+
+		Collection<ChessMove> moves = game.validMoves(position);
+
+		System.out.println(moves);
 	}
 
-	private void redrawChessboard() { return; }
-
 	private void leave() {
-		WebSocketConnection ws = app.getConnection();
-		ws.close();
-		app.setGameID(0);
-		app.setColor(null);
+		ws.sendMessage(gson.toJson(new Leave(app.getGameID(), app.getAuthToken())));
 
 		navigate();
 		app.navigateToPostLogin();
 	}
+	private void resign() {
+		System.out.print("Are you sure you want to resign? (y/n): ");
+		String confirmation = scanner.nextLine();
+		if (confirmation.equalsIgnoreCase("y")) {
+			// TODO: Implement the logic to resign the game
+			System.out.println("You have resigned from the game.");
 
-	private void drawChessboard() {
-		boolean whiteAtBottom = (app.getColor() != ChessGame.TeamColor.BLACK);
-		drawChessboardOrientation(whiteAtBottom);
+			ws.sendMessage(gson.toJson(new Resign(app.getGameID(), app.getAuthToken())));
+
+			ws.close();
+			app.setGameID(0);
+			app.setColor(null);
+
+			navigate();
+			app.navigateToPostLogin();
+		}
 	}
 
-	private void drawChessboardOrientation(boolean whiteAtBottom) {
-		String[][] board = getInitialChessboard();
+	private void redrawChessboard() { return; }
+
+	private void drawChessboard() {
+		drawChessboardOrientation();
+	}
+
+	private void drawChessboardOrientation() {
+		boolean whiteAtBottom = (app.getColor() == ChessGame.TeamColor.WHITE);
+		System.out.println(whiteAtBottom);
 
 		String columns = generateColumnLabels(whiteAtBottom);
 
 		System.out.println(columns);
 
-		drawChessboardRows(board, whiteAtBottom);
+		drawChessboardRows(game.getBoard(), whiteAtBottom);
 
 		System.out.println(columns);
 	}
@@ -182,7 +199,7 @@ public class GamePlayUI extends Repl {
 		return columnsBuilder.toString();
 	}
 
-	private void drawChessboardRows(String[][] board, boolean whiteAtBottom) {
+	private void drawChessboardRows(ChessBoard board, boolean whiteAtBottom) {
 		int rowStart = whiteAtBottom ? 7 : 0;
 		int rowEnd = whiteAtBottom ? -1 : 8;
 		int rowStep = whiteAtBottom ? -1 : 1;
@@ -194,53 +211,41 @@ public class GamePlayUI extends Repl {
 		}
 	}
 
-	private void drawChessboardRow(String[][] board, int row, boolean whiteAtBottom) {
+	private void drawChessboardRow(ChessBoard board, int row, boolean whiteAtBottom) {
 		int colStart = whiteAtBottom ? 0 : 7;
 		int colEnd = whiteAtBottom ? 8 : -1;
 		int colStep = whiteAtBottom ? 1 : -1;
 		for (int col = colStart; col != colEnd; col += colStep) {
-			String piece = board[row][col];
+			ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
+			String pieceSymbol = getPieceSymbol(piece);
 			String bgColor = ((row + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
-			System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
+			System.out.print(bgColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
 		}
 	}
 
-	private String[][] getInitialChessboard() {
-		String[][] board = new String[8][8];
-
-		// Initialize the chessboard with empty squares
-		for (int row = 0; row < 8; row++) {
-			for (int col = 0; col < 8; col++) {
-				board[row][col] = EscapeSequences.EMPTY;
-			}
+	private String getPieceSymbol(ChessPiece piece) {
+		if (piece == null) {
+			return EscapeSequences.EMPTY;
 		}
 
-		// Place the white pieces
-		board[7][0] = EscapeSequences.WHITE_ROOK;
-		board[7][1] = EscapeSequences.WHITE_KNIGHT;
-		board[7][2] = EscapeSequences.WHITE_BISHOP;
-		board[7][3] = EscapeSequences.WHITE_KING;
-		board[7][4] = EscapeSequences.WHITE_QUEEN;
-		board[7][5] = EscapeSequences.WHITE_BISHOP;
-		board[7][6] = EscapeSequences.WHITE_KNIGHT;
-		board[7][7] = EscapeSequences.WHITE_ROOK;
-		for (int col = 0; col < 8; col++) {
-			board[6][col] = EscapeSequences.WHITE_PAWN;
-		}
+		ChessGame.TeamColor color = piece.getTeamColor();
+		ChessPiece.PieceType type = piece.getPieceType();
 
-		// Place the black pieces
-		board[0][0] = EscapeSequences.BLACK_ROOK;
-		board[0][1] = EscapeSequences.BLACK_KNIGHT;
-		board[0][2] = EscapeSequences.BLACK_BISHOP;
-		board[0][3] = EscapeSequences.BLACK_KING;
-		board[0][4] = EscapeSequences.BLACK_QUEEN;
-		board[0][5] = EscapeSequences.BLACK_BISHOP;
-		board[0][6] = EscapeSequences.BLACK_KNIGHT;
-		board[0][7] = EscapeSequences.BLACK_ROOK;
-		for (int col = 0; col < 8; col++) {
-			board[1][col] = EscapeSequences.BLACK_PAWN;
+		switch (type) {
+			case KING:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_KING : EscapeSequences.BLACK_KING;
+			case QUEEN:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_QUEEN : EscapeSequences.BLACK_QUEEN;
+			case BISHOP:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_BISHOP : EscapeSequences.BLACK_BISHOP;
+			case KNIGHT:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_KNIGHT : EscapeSequences.BLACK_KNIGHT;
+			case ROOK:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_ROOK : EscapeSequences.BLACK_ROOK;
+			case PAWN:
+				return color == ChessGame.TeamColor.BLACK ? EscapeSequences.WHITE_PAWN : EscapeSequences.BLACK_PAWN;
+			default:
+				return EscapeSequences.EMPTY;
 		}
-
-		return board;
 	}
 }

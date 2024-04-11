@@ -197,7 +197,7 @@ public class WebSocketMessageHandler {
 
 		// Broadcast Notification message to all clients in the game
 		Notification notification = new Notification("Leaving! User: " + username);
-		sendNotificationAll(gameID, notification);
+		sendNotification(gameID, notification);
 	}
 
 	private void handleResign(Resign resign) {
@@ -225,9 +225,11 @@ public class WebSocketMessageHandler {
 		String message = gson.toJson(notification);
 
 		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
-		for (Session session : setSessions) {
-			if (this.session != session) {
-				sendMessage(session, message);
+		if (setSessions != null) {
+			for (Session session : setSessions) {
+				if (this.session != session) {
+					sendMessage(session, message);
+				}
 			}
 		}
 	}
@@ -236,8 +238,10 @@ public class WebSocketMessageHandler {
 		String message = gson.toJson(notification);
 
 		HashSet<Session> setSessions = mapGameIDToSessions.get(gameID);
-		for (Session session : setSessions) {
+		if (setSessions != null) {
+			for (Session session : setSessions) {
 				sendMessage(session, message);
+			}
 		}
 	}
 
