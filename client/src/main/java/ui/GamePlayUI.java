@@ -1,6 +1,8 @@
 package ui;
 
 import connection.WebSocketConnection;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.UserGameCommand;
 
 public class GamePlayUI extends Repl {
 	private enum MenuOption {
@@ -60,6 +62,7 @@ public class GamePlayUI extends Repl {
 	private void leaveGame() {
 		WebSocketConnection ws = app.getConnection();
 		ws.close();
+		app.setPlaying(false);
 
 		navigate();
 		app.navigateToPostLogin();

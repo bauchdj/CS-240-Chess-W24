@@ -8,6 +8,7 @@ import java.net.URI;
 public class WebSocketConnection {
 	private static URI baseUri;
 	private Session session;
+	private String authToken = null;
 
 	public static void setBaseUri(String host, int port, String path) {
 		try {
@@ -15,6 +16,14 @@ public class WebSocketConnection {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
 	}
 
 	public void connect() {

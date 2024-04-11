@@ -3,6 +3,10 @@ package ui;
 import static connection.HttpConnection.*;
 import static ui.UserInputHandler.*;
 
+import chess.ChessGame;
+import messages.JoinPlayer;
+import messages.JoinObserver;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import connection.WebSocketConnection;
@@ -152,13 +156,18 @@ public class PostLoginUI extends Repl {
 		return -1;
 	}
 
-	// TODO WebScocket Connection
-	private void connectWS() {
+	private void connectWS(int gameId, String clientColor) {
 		WebSocketConnection ws = new WebSocketConnection();
 		app.setConnection(ws);
 		ws.connect();
 
-		String message = (app.isPlaying()) ? "playing" : "observing";
+		String authToken = app.getAuthToken();
+		ws.setAuthToken(authToken);
+
+		Object join = (app.isPlaying()) ?
+			new JoinPlayer(gameId, ChessGame.TeamColor.valueOf(clientColor.toUpperCase()), authToken) :
+			new JoinObserver(gameId, authToken);
+		String message = gson.toJson(join);
 		ws.sendMessage(message);
 	}
 
@@ -173,7 +182,7 @@ public class PostLoginUI extends Repl {
 		sendPutRequest("/game", requestBody.toString(), (response) -> {
 			System.out.println("Join / Observe game successful!");
 
-			connectWS();
+			connectWS(gameId, clientColor);
 
 			navigate();
 			app.navigateToGamePlay();
@@ -185,7 +194,7 @@ public class PostLoginUI extends Repl {
 	private void logout() {
 		sendDeleteRequest("/session", (response) -> {
 			System.out.println("Logged out successfully!");
-			setAuthToken(null);
+			app.setAuthToken(null);
 			navigate();
 			app.navigateToPreLogin();
 		}, () -> {

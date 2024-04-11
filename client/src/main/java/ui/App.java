@@ -61,6 +61,15 @@ public class App {
 		isPlaying = playing;
 	}
 
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public void setAuthToken(String authToken) {
+		HttpConnection.setAuthToken(authToken);
+		this.authToken = authToken;
+	}
+
 	public void navigateToPostLogin() {
 		currentState = State.POST_LOGIN;
 	}

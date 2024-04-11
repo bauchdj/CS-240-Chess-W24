@@ -163,7 +163,7 @@ public class ChessGame {
         return lastPos.getRow() == opposingPawnRow && startPos.getRow() == opposingPawnRow;
     }
 
-    public static void addEnPassantValidMoves(ChessBoard board, ChessMove lastMove, ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
+    private static void addEnPassantValidMoves(ChessBoard board, ChessMove lastMove, ChessPosition startPos, ChessPiece piece, Collection<ChessMove> moves) {
         if (!isEnPassantPossible(board, lastMove, startPos, piece)) return;
 
         ChessPosition lastPos = lastMove.getEndPosition();
@@ -213,7 +213,7 @@ public class ChessGame {
         return staticValidMoves(this, this.board.copy(), startPosition);
     }
 
-    public static void executeEnPassantMove(ChessBoard board, ChessMove lastMove, ChessMove move, ChessPiece piece) {
+    private static void executeEnPassantMove(ChessBoard board, ChessMove lastMove, ChessMove move, ChessPiece piece) {
         if (!isEnPassantPossible(board, lastMove, move.getStartPosition(), piece)) return;
 
         ChessPosition lastPos = lastMove.getEndPosition();

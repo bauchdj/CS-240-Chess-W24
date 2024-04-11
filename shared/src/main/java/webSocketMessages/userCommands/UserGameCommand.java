@@ -23,6 +23,7 @@ public class UserGameCommand {
     }
 
     protected CommandType commandType;
+    protected int gameID;
 
     private final String authToken;
 
