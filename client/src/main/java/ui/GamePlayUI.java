@@ -6,10 +6,12 @@ import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 public class GamePlayUI extends Repl {
 	private WebSocketConnection ws;
 	private ChessGame game;
+	private HashSet<ChessPosition> validMovePositions = null;
 
 	private enum MenuOption {
 		HELP(1, "Help"),
@@ -122,7 +124,7 @@ public class GamePlayUI extends Repl {
 	private void makeMove() {
 		System.out.print("Enter your move (e.g., e2e4): ");
 		String move = scanner.nextLine();
-		
+
 		ChessPosition startPos = new ChessPosition(move.substring(0, 2));
 		ChessPosition endPos = new ChessPosition(move.substring(2));
 
@@ -140,9 +142,23 @@ public class GamePlayUI extends Repl {
 
 		ChessPosition position = new ChessPosition(coordinates);
 
+		if (game.getBoard().getPiece(position) == null) {
+			System.out.println("Sorry, no piece there.");
+			return;
+		}
+
 		Collection<ChessMove> moves = game.validMoves(position);
 
-		System.out.println(moves);
+		// Create a list to store the valid move positions
+		validMovePositions = new HashSet<>();
+
+		// Extract the end positions from the valid moves and add them to the list
+		for (ChessMove move : moves) {
+			validMovePositions.add(move.getEndPosition());
+		}
+
+		// Draw the chessboard with the valid move positions highlighted
+		drawChessboard();
 	}
 
 	private void leave() {
@@ -217,7 +233,12 @@ public class GamePlayUI extends Repl {
 		for (int col = colStart; col != colEnd; col += colStep) {
 			ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
 			String pieceSymbol = getPieceSymbol(piece);
-			String bgColor = ((row + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+
+			// Check if the current position is a valid move position, if so make it Green!
+			String bgColor = (validMovePositions != null && validMovePositions.contains(new ChessPosition(row + 1, col + 1))) ?
+				((row + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN :
+				((row + col) % 2 == 0) ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+
 			System.out.print(bgColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
 		}
 	}
